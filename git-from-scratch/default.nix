@@ -1,10 +1,19 @@
-let IHaskell = (import <nixpkgs> {}).fetchFromGitHub {
+let
+  fetch    = (import <nixpkgs> {}).fetchFromGitHub;
+  IHaskell = fetch {
     owner  = "gibiansky";
     repo   = "IHaskell";
-    rev    = "f39b812fdcc5566210f9960f8218c5fc7fd40a77";
-    sha256 = "1hz9rsgv3y4cmmlc7655m96jad953d6fv6cqvp8yjdv3sj7szjza";
+    rev    = "f34c3e258934cb3c9ae5b0012fd7f669b0870e70";
+    sha256 = "0rcy2yvi0qg443mfwri74d567smrz9v2cc9qs230caiz162aaih9";
+  };
+  pinned   = fetch {
+    owner  = "NixOS";
+    repo   = "nixpkgs";
+    rev    = "81628ce54f703fd518432ec3b429083cb183d747";
+    sha256 = "01bir37cxwi252977prxgd0nmlzybcs4x7w2an51jim6mvk7500s";
   };
 in import "${IHaskell}/release.nix" {
+  nixpkgs = pinned;
   packages = self: with self; [
     SHA
     attoparsec
