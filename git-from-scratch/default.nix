@@ -31,5 +31,6 @@ in import "${IHaskell}/release.nix" {
     findutils
     git
     qpdf
+    vim
   ];
 }
