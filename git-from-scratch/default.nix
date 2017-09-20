@@ -9,8 +9,8 @@ let
   pinned   = fetch {
     owner  = "NixOS";
     repo   = "nixpkgs";
-    rev    = "81628ce54f703fd518432ec3b429083cb183d747";
-    sha256 = "01bir37cxwi252977prxgd0nmlzybcs4x7w2an51jim6mvk7500s";
+    rev    = "83706dd49f4b476ae44b39f64d1fcdf587783c7a";
+    sha256 = "18d8rcnhb70qqaqa5h2ganazn07a8mimpj29ilbzx0pi5a8zj7bv";
   };
 in import "${IHaskell}/release.nix" {
   pkgs = import pinned {};
