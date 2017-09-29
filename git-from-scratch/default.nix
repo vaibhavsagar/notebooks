@@ -12,8 +12,11 @@ let
     rev    = "83706dd49f4b476ae44b39f64d1fcdf587783c7a";
     sha256 = "18d8rcnhb70qqaqa5h2ganazn07a8mimpj29ilbzx0pi5a8zj7bv";
   };
+  nixpkgs = import pinned {};
+  git-from-scratch =
+    nixpkgs.haskellPackages.callCabal2nix "git-from-scratch" (nixpkgs.lib.cleanSource ./.) {};
 in import "${IHaskell}/release.nix" {
-  pkgs = import pinned {};
+  pkgs = nixpkgs;
   packages = self: with self; [
     SHA
     attoparsec
@@ -23,6 +26,7 @@ in import "${IHaskell}/release.nix" {
     containers
     directory
     filepath
+    git-from-scratch
     utf8-string
     zlib
   ];
