@@ -150,7 +150,6 @@ parseTag = do
     tAnnotation <- A.takeByteString
     return $ Tag tObject tType tTag tTagger tAnnotation
 
-
 parseGitObject :: Parser GitObject
 parseGitObject = do
     headerLen <- parseHeader
