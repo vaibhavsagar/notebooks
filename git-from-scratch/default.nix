@@ -20,6 +20,8 @@ let
       (type == "directory" && (baseName == ".git" || baseName == "dist")) ||
       (type == "directory" && (baseName == "solarized"))                  ||
       (type == "symlink"   && (lib.hasPrefix "result" baseName))          ||
+      lib.hasSuffix ".nix"   baseName                                     ||
+      lib.hasSuffix ".yaml"  baseName                                     ||
       lib.hasSuffix ".hi"    baseName                                     ||
       lib.hasSuffix ".o"     baseName                                     ||
       lib.hasSuffix ".ipynb" baseName                                     ||
