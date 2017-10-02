@@ -3,8 +3,8 @@ let
   IHaskell = fetch {
     owner  = "gibiansky";
     repo   = "IHaskell";
-    rev    = "95735f19e40e6fe9c26f65642019bf23b074e84a";
-    sha256 = "0zwvm40gbcbpqvdqilwc333dgam24p1hz60wnslk1awzbis554g1";
+    rev    = "8d022fa441fe8c7ebc9f377c0f30bee60fbde6b0";
+    sha256 = "0wpvc7mw5x8gvclx1aziil4zn36w79dl6svfl69l7vnsc7y10ykk";
   };
   pinned   = fetch {
     owner  = "NixOS";
