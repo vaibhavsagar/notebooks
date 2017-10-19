@@ -3,14 +3,14 @@ let
   IHaskell = fetch {
     owner  = "gibiansky";
     repo   = "IHaskell";
-    rev    = "8d022fa441fe8c7ebc9f377c0f30bee60fbde6b0";
-    sha256 = "0wpvc7mw5x8gvclx1aziil4zn36w79dl6svfl69l7vnsc7y10ykk";
+    rev    = "32aea170c41b181e34e76b9d9eb391e540fed6e1";
+    sha256 = "17n24pxizifvsxyh4lc8jgr45csbmrz936qssj8i5l96yr2fqz4b";
   };
   pinned   = fetch {
     owner  = "NixOS";
     repo   = "nixpkgs";
-    rev    = "83706dd49f4b476ae44b39f64d1fcdf587783c7a";
-    sha256 = "18d8rcnhb70qqaqa5h2ganazn07a8mimpj29ilbzx0pi5a8zj7bv";
+    rev    = "c99239bca08d12bf98000961912b4c0ad52a8a7e";
+    sha256 = "1d3hwaflsyb6vj2czj3jpaxvdmsr448sd0536lhaillvsm087y0g";
   };
   nixpkgs = import pinned {};
   cleanSource = name: type: let
@@ -30,7 +30,7 @@ let
   git-from-scratch =
     nixpkgs.haskellPackages.callCabal2nix "git-from-scratch" (builtins.filterSource cleanSource ./.) {};
 in import "${IHaskell}/release.nix" {
-  pkgs = nixpkgs;
+  inherit nixpkgs;
   packages = self: with self; [
     SHA
     attoparsec
