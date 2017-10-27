@@ -1,0 +1,17 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash
+#! nix-shell -p curl jq nix
+
+set -eufo pipefail
+
+OWNER=$1
+REPO=$2
+BRANCH=${3:-master}
+
+REV=$(curl "https://api.github.com/repos/$OWNER/$REPO/branches/$BRANCH" | jq -r '.commit.sha')
+SHA256=$(nix-prefetch-url --unpack "https://github.com/$OWNER/$REPO/archive/$REV.tar.gz")
+jq -n '{owner: $owner, repo: $repo, rev: $rev, sha256: $sha256}' \
+  --arg owner "$OWNER" \
+  --arg repo "$REPO" \
+  --arg rev "$REV" \
+  --arg sha256 "$SHA256"
