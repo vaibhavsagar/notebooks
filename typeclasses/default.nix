@@ -21,5 +21,5 @@ let
     );
 in import "${IHaskell}/release.nix" {
   inherit nixpkgs;
-  packages = self: with self; [ plotlyhs lucid ];
+  packages = self: with self; [];
 }
