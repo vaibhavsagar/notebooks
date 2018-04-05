@@ -2,13 +2,13 @@
   "ihaskell": {
     "owner": "gibiansky",
     "repo": "IHaskell",
-    "rev": "2d43d305d1b0e50ed8dcdcc6b959ef3f3d9cdc0e",
-    "sha256": "0y1a13irikyziva5b4fh3vhmncrh0fdn4dj7k2ar65zj41yd9l13"
+    "rev": "a65429d2a9c0f3fa48a074c5dd2422af017cba98",
+    "sha256": "0qva5dgzmgfxp9dqlyq81lmljhg9zx1k371wbra6s2a0s4msz9d0"
   },
   "nixpkgs": {
     "owner": "NixOS",
     "repo": "nixpkgs-channels",
-    "rev": "b8c0cc4551a2324c16b44a522f6772d8b453d607",
-    "sha256": "0mg3ca9vi8wpbqdmn6lp5x44x63rhbnc4yiz96mv2vs1k0s6ranh"
+    "rev": "a74969256b0a6a8de03d9ccb6e92c816320ba1fd",
+    "sha256": "1fm91xl5328na0db92agsl3ab6r2km8a572s2hfhbsv4sa7az9vx"
   }
 }
