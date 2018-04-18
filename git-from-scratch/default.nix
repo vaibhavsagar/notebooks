@@ -1,7 +1,6 @@
 let
-  pkgs     = import ../pkgs.nix;
-  IHaskell = pkgs.ihaskell;
-  nixpkgs  = import pkgs.nixpkgs {};
+  pkgs = import ../pkgs.nix;
+  nixpkgs = import pkgs.nixpkgs {};
   cleanSource = name: type: let
       baseName = baseNameOf (toString name);
       lib = nixpkgs.lib;
@@ -18,7 +17,7 @@ let
     );
   git-from-scratch =
     nixpkgs.haskellPackages.callCabal2nix "git-from-scratch" (builtins.filterSource cleanSource ./.) {};
-in import "${IHaskell}/release.nix" {
+in import "${pkgs.ihaskell}/release.nix" {
   inherit nixpkgs;
   packages = self: with self; [
     SHA

@@ -1,6 +1,5 @@
 let
-  pkgs     = import ../pkgs.nix;
-  IHaskell = pkgs.ihaskell;
-in import "${IHaskell}/release.nix" {
+  pkgs = import ../pkgs.nix;
+in import "${pkgs.ihaskell}/release.nix" {
   nixpkgs = import pkgs.nixpkgs {};
 }
