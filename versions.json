@@ -2,8 +2,8 @@
   "ihaskell": {
     "owner": "gibiansky",
     "repo": "IHaskell",
-    "rev": "4bedc1e71bb6923834eab681b9b13eb480a7604d",
-    "sha256": "05sikjr7py9ykzaq7dw20k960p9xrvk9zcp2k0cpa8x3x3x14bj7"
+    "rev": "d53ecedb4ea8f047535410cc61985f9c5bfa2ec0",
+    "sha256": "1m1gqi9vh1a28a7avxq89dclg3ikh6f29hx0pscpyzzrq3x8vg1k"
   },
   "nixpkgs": {
     "owner": "NixOS",
