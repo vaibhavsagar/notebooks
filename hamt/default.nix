@@ -3,5 +3,5 @@ let
 in import "${pkgs.ihaskell}/release.nix" {
   compiler = "ghc822";
   nixpkgs  = import pkgs.nixpkgs {};
-  packages = self: with self; [ memory pretty-show vector ];
+  packages = self: with self; [ bytestring memory pretty-show vector ];
 }
