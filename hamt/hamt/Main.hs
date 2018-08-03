@@ -97,11 +97,6 @@ insert' shift hash key value (Many bitmap vector)
 fromList :: Hashable key => [(key, value)] -> HAMT key value
 fromList = foldr (uncurry insert) empty
 
-fibSlow :: Int -> Int
-fibSlow 0 = 1
-fibSlow 1 = 1
-fibSlow n = fibSlow (n-1) + fibSlow (n-2)
-
 lookup :: Hashable key => key -> HAMT key value -> Maybe value
 lookup key hamt = lookup' 0 (hash key) hamt
 
@@ -118,6 +113,11 @@ lookup' shift hash (Many bitmap vector)
     where
         mask = bitMask hash shift
         index = maskIndex bitmap mask
+
+fibSlow :: Int -> Int
+fibSlow 0 = 1
+fibSlow 1 = 1
+fibSlow n = fibSlow (n-1) + fibSlow (n-2)
 
 instance Hashable Int where
     hash int = Binary (fromIntegral int)
