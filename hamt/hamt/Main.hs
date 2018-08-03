@@ -21,7 +21,7 @@ newtype Binary a = Binary a deriving (Enum, Ord, Real, Integral, Eq, Num, Bits, 
 instance (FiniteBits a, Show a, Integral a) => Show (Binary a) where
     show (Binary a) = let
         str = showIntAtBase 2 intToDigit a ""
-        size = finiteBitSize $ undefined `asTypeOf` a
+        size = finiteBitSize a
         in replicate (size - length str) '0' <> str
 
 type Hash = Binary Word32
