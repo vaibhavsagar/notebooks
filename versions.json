@@ -8,7 +8,7 @@
   "nixpkgs": {
     "owner": "NixOS",
     "repo": "nixpkgs-channels",
-    "rev": "6115f4777031924af1f91a08ed88cd8826fd649f",
-    "sha256": "0fcg12zh3i2ij4ijxmcd7qbvr0mmrng672ll1imwma6h3q9imirp"
+    "rev": "230f98aa79b44229a3cbb8c0b9cd9f44d406b1c2",
+    "sha256": "1ijsiwsz68g0f5np1p2rhsgxrrslknqgp63f7jbziwgn4yp2xq8k"
   }
 }
