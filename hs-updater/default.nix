@@ -8,8 +8,8 @@ in import "${pkgs.ihaskell}/release.nix" {
     aeson-pretty
     bytestring
     data-default-class
-    lens
-    lens-aeson
+    microlens
+    microlens-aeson
     process
     req
     text
