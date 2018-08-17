@@ -62,7 +62,7 @@ buildURL project
 
 getSha256 :: Text -> Bool -> IO Text
 getSha256 url doUnpack = let
-    option = if doUnpack then ["--unpack"] else []
+    option = ["--unpack" | doUnpack]
     in pack . init <$>
         readProcess "nix-prefetch-url" (option ++ [unpack url]) ""
 
@@ -84,8 +84,8 @@ main = do
         n | n < 2 -> putStrLn "Not enough arguments!"
         2 -> let
             [filename, projectName] = args
-            in update filename (pack projectName) "master" False
+            in update filename (pack projectName) "master" True
         3 -> let
             [filename, projectName, branchName] = args
-            in update filename (pack projectName) (pack branchName) False
+            in update filename (pack projectName) (pack branchName) True
         _ -> putStrLn "Too many arguments!"
