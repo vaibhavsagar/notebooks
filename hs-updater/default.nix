@@ -7,13 +7,11 @@ in import "${pkgs.ihaskell}/release.nix" {
     aeson
     aeson-pretty
     bytestring
-    containers
     data-default-class
+    lens
     lens-aeson
+    process
     req
     text
-    transformers
-    unordered-containers
-    vector
   ];
 }
