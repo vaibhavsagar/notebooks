@@ -49,10 +49,10 @@ r project branch = req GET
     /: branch
     ) NoReqBody jsonResponse (header "User-Agent" "vaibhavsagar")
 
-getRev :: Project -> Text -> IO (Maybe Text)
+getRev :: Project -> Text -> MaybeT IO Text
 getRev project branch = do
-    res <- responseBody <$> runReq def (r project branch) :: IO Value
-    return $ res ^? key "commit" . key "sha" . _String
+    res <- lift (responseBody <$> runReq def (r project branch) :: IO Value)
+    MaybeT . pure $ res ^? key "commit" . key "sha" . _String
 
 buildURL :: Project -> Text
 buildURL project
@@ -68,18 +68,18 @@ getSha256 url doUnpack = let
     in pack . init <$>
         readProcess "nix-prefetch-url" (option ++ [unpack url]) ""
 
-modify :: FilePath -> Text -> Text -> Bool -> IO (Maybe Value)
-modify filename projectName branchName doUnpack = runMaybeT $ do
+modify :: FilePath -> Text -> Text -> Bool -> MaybeT IO Value
+modify filename projectName branchName doUnpack = do
     versions <- MaybeT (decode <$> readFile filename :: IO (Maybe Value))
     project <- MaybeT . pure $ extractProject versions projectName
-    rev' <- MaybeT $ getRev project branchName
+    rev' <- getRev project branchName
     sha256' <- lift $ getSha256 (buildURL project { rev = rev' }) doUnpack
     let project' = project { rev = rev', sha256 = sha256' }
     pure $ versions & key projectName .~ toJSON project'
 
 update :: FilePath -> Text -> Text -> Bool -> IO ()
 update filename projectName branchName doUnpack =
-    modify filename projectName branchName doUnpack >>= \case
+    runMaybeT (modify filename projectName branchName doUnpack) >>= \case
         Just updated -> writeFile filename (encodePretty'
             defConfig { confIndent = Spaces 2, confCompare = compare } updated)
         Nothing -> pure ()
@@ -90,5 +90,5 @@ main = getArgs >>= \case
     [filename, projectName] ->
         update filename (pack projectName) "master" True
     [filename, projectName, branchName] ->
-            update filename (pack projectName) (pack branchName) True
+        update filename (pack projectName) (pack branchName) True
     _ -> putStrLn "Too many arguments!"
