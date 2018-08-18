@@ -26,22 +26,13 @@ import Prelude hiding (readFile, writeFile)
 import System.Environment (getArgs)
 import System.Process
 
-data Project = Project
-    { owner  :: Text
-    , repo   :: Text
-    , rev    :: Text
-    , sha256 :: Text
-    } deriving (Show, Generic, FromJSON, ToJSON)
+data Project = Project { owner, repo, rev, sha256 :: Text }
+    deriving (Generic, FromJSON, ToJSON)
 
 r :: (MonadHttp m, FromJSON a) => Project -> Text -> m (JsonResponse a)
-r project branch = req GET
-    (  https "api.github.com"
-    /: "repos"
-    /: owner project
-    /: repo project
-    /: "branches"
-    /: branch
-    ) NoReqBody jsonResponse (header "User-Agent" "vaibhavsagar")
+r p b = req GET
+    (https "api.github.com" /: "repos" /: owner p /: repo p /: "branches" /: b)
+    NoReqBody jsonResponse (header "User-Agent" "vaibhavsagar")
 
 getRev :: Project -> Text -> MaybeT IO Text
 getRev project branch = do
@@ -49,12 +40,9 @@ getRev project branch = do
     MaybeT . pure $ res ^? key "commit" . key "sha" . _String
 
 buildURL :: Project -> Text
-buildURL project
-    =  "https://github.com/"
-    <> owner project <> "/"
-    <> repo project  <> "/"
-    <> "archive"     <> "/"
-    <> rev project   <> ".tar.gz"
+buildURL p =
+    "https://github.com/" <> owner p <> "/" <> repo p <> "/" <> "archive" <> "/"
+    <> rev p <> ".tar.gz"
 
 getSha256 :: Text -> Bool -> IO Text
 getSha256 url doUnpack = pack . init <$>
@@ -62,7 +50,7 @@ getSha256 url doUnpack = pack . init <$>
 
 modify :: FilePath -> Text -> Text -> Bool -> MaybeT IO Value
 modify filename projectName branchName doUnpack = do
-    versions <- MaybeT (decode <$> readFile filename :: IO (Maybe Value))
+    versions <- MaybeT $ decode <$> readFile filename
     project <- MaybeT . pure $
         parseMaybe parseJSON =<< versions ^? key projectName
     rev' <- getRev project branchName
