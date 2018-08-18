@@ -3,17 +3,19 @@
 #! nix-shell -p nix
 #! nix-shell -p "haskellPackages.ghcWithPackages (self: with self; [ aeson-pretty microlens-aeson req ])"
 
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad.Trans.Class (lift)
-import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Trans.Maybe
 import Data.ByteString.Lazy (ByteString, readFile, writeFile)
 import Data.Default.Class
 import Data.Aeson
+import Data.Aeson.Types
 import Data.Aeson.Encode.Pretty
+import Data.Maybe (maybe)
 import Data.Monoid ((<>))
 import Data.Text (Text, pack, unpack)
 import GHC.Generics
@@ -29,15 +31,7 @@ data Project = Project
     , repo   :: Text
     , rev    :: Text
     , sha256 :: Text
-    } deriving (Show, Generic)
-
-instance FromJSON Project
-instance ToJSON Project
-
-extractProject :: Value -> Text -> Maybe Project
-extractProject versions name = fromJSON <$> versions ^? key name >>= \case
-    Error _ -> Nothing
-    Success p -> Just p
+    } deriving (Show, Generic, FromJSON, ToJSON)
 
 r :: (MonadHttp m, FromJSON a) => Project -> Text -> m (JsonResponse a)
 r project branch = req GET
@@ -63,15 +57,14 @@ buildURL project
     <> rev project   <> ".tar.gz"
 
 getSha256 :: Text -> Bool -> IO Text
-getSha256 url doUnpack = let
-    option = ["--unpack" | doUnpack]
-    in pack . init <$>
-        readProcess "nix-prefetch-url" (option ++ [unpack url]) ""
+getSha256 url doUnpack = pack . init <$>
+    readProcess "nix-prefetch-url" (["--unpack" | doUnpack ] ++ [unpack url]) ""
 
 modify :: FilePath -> Text -> Text -> Bool -> MaybeT IO Value
 modify filename projectName branchName doUnpack = do
     versions <- MaybeT (decode <$> readFile filename :: IO (Maybe Value))
-    project <- MaybeT . pure $ extractProject versions projectName
+    project <- MaybeT . pure $
+        parseMaybe parseJSON =<< versions ^? key projectName
     rev' <- getRev project branchName
     sha256' <- lift $ getSha256 (buildURL project { rev = rev' }) doUnpack
     let project' = project { rev = rev', sha256 = sha256' }
@@ -79,10 +72,9 @@ modify filename projectName branchName doUnpack = do
 
 update :: FilePath -> Text -> Text -> Bool -> IO ()
 update filename projectName branchName doUnpack =
-    runMaybeT (modify filename projectName branchName doUnpack) >>= \case
-        Just updated -> writeFile filename (encodePretty'
-            defConfig { confIndent = Spaces 2, confCompare = compare } updated)
-        Nothing -> pure ()
+    runMaybeT (modify filename projectName branchName doUnpack) >>= maybe
+        (pure ()) (writeFile filename . encodePretty' defConfig
+            { confIndent = Spaces 2, confCompare = compare })
 
 main :: IO ()
 main = getArgs >>= \case
