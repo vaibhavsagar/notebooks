@@ -6,7 +6,10 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-import Data.ByteString.Lazy (readFile, writeFile)
+import Control.Monad.Trans.Class (lift)
+import Control.Monad.IO.Class (liftIO)
+import Control.Monad.Trans.Maybe
+import Data.ByteString.Lazy (ByteString, readFile, writeFile)
 import Data.Default.Class
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
@@ -66,16 +69,22 @@ getSha256 url doUnpack = let
     in pack . init <$>
         readProcess "nix-prefetch-url" (option ++ [unpack url]) ""
 
+modify :: FilePath -> Text -> Text -> Bool -> IO (Maybe Value)
+modify filename projectName branchName doUnpack = runMaybeT $ do
+    versions <- MaybeT (decode <$> readFile filename :: IO (Maybe Value))
+    project <- MaybeT . pure $ extractProject versions projectName
+    rev' <- MaybeT $ getRev project branchName
+    sha256' <- lift $ getSha256 (buildURL project { rev = rev' }) doUnpack
+    let project' = project { rev = rev', sha256 = sha256' }
+    pure $ versions & key projectName .~ toJSON project'
+
 update :: FilePath -> Text -> Text -> Bool -> IO ()
 update filename projectName branchName doUnpack = do
-    Just versions <- decode <$> readFile filename :: IO (Maybe Value)
-    let (Just project) = extractProject versions projectName
-    Just latestRev <- getRev project branchName
-    latestSha256 <- getSha256 (buildURL project { rev = latestRev }) doUnpack
-    let project' = project { rev = latestRev, sha256 = latestSha256 }
-    let versions' = versions & key projectName .~ toJSON project'
-    writeFile filename (encodePretty'
-        defConfig { confIndent = Spaces 2, confCompare = compare } versions')
+    result <- modify filename projectName branchName doUnpack
+    case result of
+        Just updated -> writeFile filename (encodePretty'
+            defConfig { confIndent = Spaces 2, confCompare = compare } updated)
+        Nothing -> pure ()
 
 main :: IO ()
 main = do
