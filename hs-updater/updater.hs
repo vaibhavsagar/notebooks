@@ -5,7 +5,6 @@
 
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad.Trans.Class (lift)
@@ -63,8 +62,8 @@ update fName pName bName doUnpack =
             { confIndent = Spaces 2, confCompare = compare })
 
 main :: IO ()
-main = getArgs >>= \case
-    a | length a < 2 -> putStrLn "Not enough arguments!"
+main = getArgs >>= \args -> case args of
+    _ | length args < 2 -> putStrLn "Not enough arguments!"
     [fName, pName] -> update fName (pack pName) "master" True
     [fName, pName, bName] -> update fName (pack pName) (pack bName) True
     _ -> putStrLn "Too many arguments!"
