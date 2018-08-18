@@ -4,6 +4,7 @@
 #! nix-shell -p "haskellPackages.ghcWithPackages (self: with self; [ aeson-pretty microlens-aeson req ])"
 
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad.Trans.Class (lift)
@@ -34,11 +35,9 @@ instance FromJSON Project
 instance ToJSON Project
 
 extractProject :: Value -> Text -> Maybe Project
-extractProject versions name = do
-    prj <- versions ^? key name
-    case fromJSON prj of
-        Error _ -> Nothing
-        Success p -> Just p
+extractProject versions name = fromJSON <$> versions ^? key name >>= \case
+    Error _ -> Nothing
+    Success p -> Just p
 
 r :: (MonadHttp m, FromJSON a) => Project -> Text -> m (JsonResponse a)
 r project branch = req GET
@@ -79,22 +78,17 @@ modify filename projectName branchName doUnpack = runMaybeT $ do
     pure $ versions & key projectName .~ toJSON project'
 
 update :: FilePath -> Text -> Text -> Bool -> IO ()
-update filename projectName branchName doUnpack = do
-    result <- modify filename projectName branchName doUnpack
-    case result of
+update filename projectName branchName doUnpack =
+    modify filename projectName branchName doUnpack >>= \case
         Just updated -> writeFile filename (encodePretty'
             defConfig { confIndent = Spaces 2, confCompare = compare } updated)
         Nothing -> pure ()
 
 main :: IO ()
-main = do
-    args <- getArgs
-    case length args of
-        n | n < 2 -> putStrLn "Not enough arguments!"
-        2 -> let
-            [filename, projectName] = args
-            in update filename (pack projectName) "master" True
-        3 -> let
-            [filename, projectName, branchName] = args
-            in update filename (pack projectName) (pack branchName) True
-        _ -> putStrLn "Too many arguments!"
+main = getArgs >>= \case
+    a | length a < 2 -> putStrLn "Not enough arguments!"
+    [filename, projectName] ->
+        update filename (pack projectName) "master" True
+    [filename, projectName, branchName] ->
+            update filename (pack projectName) (pack branchName) True
+    _ -> putStrLn "Too many arguments!"
