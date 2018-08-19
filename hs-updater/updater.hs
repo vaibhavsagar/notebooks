@@ -1,32 +1,36 @@
 #!/usr/bin/env nix-shell
 #! nix-shell -i runhaskell
 #! nix-shell -p nix
-#! nix-shell -p "haskellPackages.ghcWithPackages (self: with self; [ aeson-pretty microlens-aeson req ])"
+#! nix-shell -p "haskellPackages.ghcWithPackages (self: with self; [ aeson-pretty microlens-aeson optparse-applicative req ])"
 
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Maybe
-import Data.ByteString.Lazy (ByteString, readFile, writeFile)
-import Data.Default.Class
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Aeson.Encode.Pretty
+import Data.ByteString.Lazy (ByteString, readFile, writeFile)
+import Data.Default.Class
 import Data.Maybe (maybe)
-import Data.Monoid ((<>))
+import Data.Semigroup ((<>))
 import Data.Text (Text, intercalate, pack, unpack)
 import GHC.Generics
 import Lens.Micro
 import Lens.Micro.Aeson
 import Network.HTTP.Req
+import Options.Applicative hiding (header)
 import Prelude hiding (readFile, writeFile)
 import System.Environment (getArgs)
 import System.Process
 
 data Project = Project { owner, repo, rev, sha256 :: Text }
     deriving (Generic, FromJSON, ToJSON)
+
+data Opts = Opts { fName :: FilePath, pName, bName :: Text, extract :: Bool }
 
 r :: MonadHttp m => Project -> Text -> m (JsonResponse Value)
 r p b = req GET
@@ -46,24 +50,28 @@ getSha256 :: Text -> Bool -> IO Text
 getSha256 url doUnpack = pack . init <$>
     readProcess "nix-prefetch-url" (["--unpack" | doUnpack ] ++ [unpack url]) ""
 
-modify :: FilePath -> Text -> Text -> Bool -> MaybeT IO Value
-modify fName pName bName doUnpack = do
+modify :: Opts -> MaybeT IO Value
+modify Opts{ fName, pName, bName, extract } = do
     versions <- MaybeT $ decode <$> readFile fName
     project <- MaybeT . pure $ parseMaybe parseJSON =<< versions ^? key pName
     rev' <- getRev project bName
-    sha256' <- lift $ getSha256 (buildURL project { rev = rev' }) doUnpack
+    sha256' <- lift $ getSha256 (buildURL project { rev = rev' }) extract
     let project' = project { rev = rev', sha256 = sha256' }
     pure $ versions & key pName .~ toJSON project'
 
-update :: FilePath -> Text -> Text -> Bool -> IO ()
-update fName pName bName doUnpack =
-    runMaybeT (modify fName pName bName doUnpack) >>= maybe
-        (pure ()) (writeFile fName . encodePretty' defConfig
-            { confIndent = Spaces 2, confCompare = compare })
+update :: Opts -> IO ()
+update opts = runMaybeT (modify opts) >>= maybe (pure ())
+    (writeFile (fName opts) . encodePretty' defConfig
+        { confIndent = Spaces 2, confCompare = compare })
 
 main :: IO ()
-main = getArgs >>= \args -> case args of
-    _ | length args < 2 -> putStrLn "Not enough arguments!"
-    [fName, pName] -> update fName (pack pName) "master" True
-    [fName, pName, bName] -> update fName (pack pName) (pack bName) True
-    _ -> putStrLn "Too many arguments!"
+main = update =<< execParser (info (helper <*> parser) mempty)
+    where parser = Opts
+            <$> argument str
+                (metavar "FILE" <> help "The file containing version data")
+            <*> argument str
+                (metavar "PROJECT" <> help "The project whose hashes to update")
+            <*> argument str
+                (metavar "BRANCH" <> help "The branch to use" <> value "master")
+            <*> flag True False (short 'n' <> long "no-unpack" <>
+                    help "Don't unpack before computing hashes")
