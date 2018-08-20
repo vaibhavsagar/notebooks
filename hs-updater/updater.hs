@@ -37,11 +37,6 @@ r Project{ owner, repo } b = req GET
     (https "api.github.com" /: "repos" /: owner /: repo /: "branches" /: b)
     NoReqBody jsonResponse (header "User-Agent" "vaibhavsagar")
 
-getRev :: Project -> Text -> MaybeT IO Text
-getRev project branch = MaybeT $ do
-    res <- responseBody <$> runReq def (r project branch)
-    pure $ res ^? key "commit" . key "sha" . _String
-
 buildURL :: Project -> Text
 buildURL Project{ owner, repo, rev } = "https://github.com/"
     <> intercalate "/" [owner, repo, "archive", rev] <> ".tar.gz"
@@ -54,10 +49,10 @@ modify :: Opts -> MaybeT IO Value
 modify Opts{ fname, pname, bname, extract } = do
     versions <- MaybeT $ decode <$> readFile fname
     project <- MaybeT . pure $ parseMaybe parseJSON =<< versions ^? key pname
-    rev' <- getRev project bname
-    sha256' <- lift $ getSha256 (buildURL project { rev = rev' }) extract
-    let project' = project { rev = rev', sha256 = sha256' }
-    pure $ versions & key pname .~ toJSON project'
+    res <- lift $ responseBody <$> runReq def (r project bname)
+    rev <- MaybeT. pure $ res ^? key "commit" . key "sha" . _String
+    sha256 <- lift $ getSha256 (buildURL project { rev }) extract
+    pure $ versions & key pname .~ toJSON project { rev, sha256 }
 
 update :: Opts -> IO ()
 update opts = runMaybeT (modify opts) >>= maybe (pure ())
