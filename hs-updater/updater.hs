@@ -37,21 +37,19 @@ r Project{ owner, repo } b = req GET
     (https "api.github.com" /: "repos" /: owner /: repo /: "branches" /: b)
     NoReqBody jsonResponse (header "User-Agent" "vaibhavsagar")
 
-buildURL :: Project -> Text
-buildURL Project{ owner, repo, rev } = "https://github.com/"
-    <> intercalate "/" [owner, repo, "archive", rev] <> ".tar.gz"
-
-getSha256 :: Text -> Bool -> IO Text
-getSha256 url doUnpack = pack . init <$>
+getSha256 :: Project -> Bool -> IO Text
+getSha256 Project{ owner, repo, rev } doUnpack = pack . init <$>
     readProcess "nix-prefetch-url" (["--unpack" | doUnpack] ++ [unpack url]) ""
+    where url = "https://github.com"
+            <> intercalate "/" [owner, repo, "archive", rev] <> ".tar.gz"
 
 modify :: Opts -> MaybeT IO Value
 modify Opts{ fname, pname, bname, extract } = do
     versions <- MaybeT $ decode <$> readFile fname
     project <- MaybeT . pure $ parseMaybe parseJSON =<< versions ^? key pname
-    res <- lift $ responseBody <$> runReq def (r project bname)
-    rev <- MaybeT. pure $ res ^? key "commit" . key "sha" . _String
-    sha256 <- lift $ getSha256 (buildURL project { rev }) extract
+    rev <- MaybeT $ responseBody <$> runReq def (r project bname) >>=
+        pure . (^? key "commit" . key "sha" . _String)
+    sha256 <- lift $ getSha256 project { rev } extract
     pure $ versions & key pname .~ toJSON project { rev, sha256 }
 
 update :: Opts -> IO ()
