@@ -43,7 +43,7 @@ buildURL Project{ owner, repo, rev } = "https://github.com/"
 
 getSha256 :: Text -> Bool -> IO Text
 getSha256 url doUnpack = pack . init <$>
-    readProcess "nix-prefetch-url" (["--unpack" | doUnpack ] ++ [unpack url]) ""
+    readProcess "nix-prefetch-url" (["--unpack" | doUnpack] ++ [unpack url]) ""
 
 modify :: Opts -> MaybeT IO Value
 modify Opts{ fname, pname, bname, extract } = do
