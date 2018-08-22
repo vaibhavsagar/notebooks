@@ -1,3 +1,6 @@
+#!/usr/bin/env nix-shell
+#! nix-shell -i runhaskell
+#! nix-shell -p "haskellPackages.ghcWithPackages (self: with self; [ memory timeit pretty-show vector ])"
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeSynonymInstances #-}
