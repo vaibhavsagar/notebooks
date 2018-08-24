@@ -8,6 +8,7 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+import Control.Applicative (optional)
 import Control.Monad.Trans.Class (lift)
 import Control.Monad.Trans.Maybe
 import Data.Aeson
@@ -27,10 +28,10 @@ import Prelude hiding (readFile, writeFile)
 import System.Environment (getArgs)
 import System.Process
 
-data Project = Project { owner, repo, rev, sha256 :: Text }
+data Project = Project { owner, repo, rev, sha256 :: Text, branch :: Maybe Text}
     deriving (Generic, FromJSON, ToJSON)
 
-data Opts = Opts { fname :: FilePath, pname, bname :: Text, extract :: Bool }
+data Opts = Opts { fname :: FilePath, pname :: Text, bname :: Maybe Text, extract :: Bool }
 
 r :: MonadHttp m => Project -> Text -> m (JsonResponse Value)
 r Project{ owner, repo } b = req GET
@@ -47,10 +48,11 @@ modify :: Opts -> MaybeT IO Value
 modify Opts{ fname, pname, bname, extract } = do
     versions <- MaybeT $ decode <$> readFile fname
     project <- MaybeT . pure $ parseMaybe parseJSON =<< versions ^? key pname
-    rev <- MaybeT $ responseBody <$> runReq def (r project bname) >>=
+    let (Just br) = bname <|> branch project <|> Just "master"
+    rev <- MaybeT $ responseBody <$> runReq def (r project br) >>=
         pure . (^? key "commit" . key "sha" . _String)
     sha256 <- lift $ getSha256 project { rev } extract
-    pure $ versions & key pname .~ toJSON project { rev, sha256 }
+    pure $ versions & key pname .~ toJSON project { rev, sha256, branch = Just br }
 
 update :: Opts -> IO ()
 update opts = runMaybeT (modify opts) >>= maybe (pure ())
@@ -64,7 +66,7 @@ main = update =<< execParser (info (helper <*> parser) mempty)
                 (metavar "FILE" <> help "The file containing version data")
             <*> argument str
                 (metavar "PROJECT" <> help "The project whose hashes to update")
-            <*> argument str
-                (metavar "BRANCH" <> help "The branch to use" <> value "master")
+            <*> optional (argument str
+                (metavar "BRANCH" <> help "The branch to use"))
             <*> flag True False (short 'n' <> long "no-unpack" <>
                     help "Don't unpack before computing hashes")
