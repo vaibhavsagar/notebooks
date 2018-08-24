@@ -41,7 +41,7 @@ r Project{ owner, repo } b = req GET
 getSha256 :: Project -> Bool -> IO Text
 getSha256 Project{ owner, repo, rev } doUnpack = pack . init <$>
     readProcess "nix-prefetch-url" (["--unpack" | doUnpack] ++ [unpack url]) ""
-    where url = "https://github.com"
+    where url = "https://github.com/"
             <> intercalate "/" [owner, repo, "archive", rev] <> ".tar.gz"
 
 modify :: Opts -> MaybeT IO Value
