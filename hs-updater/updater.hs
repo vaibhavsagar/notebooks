@@ -69,4 +69,4 @@ main = update =<< execParser (info (helper <*> parser) mempty)
             <*> optional (argument str
                 (metavar "BRANCH" <> help "The branch to use"))
             <*> flag True False (short 'n' <> long "no-unpack" <>
-                    help "Don't unpack before computing hashes")
+                help "Don't unpack before computing hashes")
