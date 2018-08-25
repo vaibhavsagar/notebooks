@@ -16,7 +16,7 @@ import Data.Aeson.Types
 import Data.Aeson.Encode.Pretty
 import Data.ByteString.Lazy (readFile, writeFile)
 import Data.Default.Class
-import Data.Maybe (maybe)
+import Data.Maybe (fromMaybe, maybe)
 import Data.Semigroup ((<>))
 import Data.Text (Text, intercalate, pack, unpack)
 import GHC.Generics
@@ -48,7 +48,7 @@ modify :: Opts -> MaybeT IO Value
 modify Opts{ fname, pname, bname, extract } = do
     versions <- MaybeT $ decode <$> readFile fname
     project <- MaybeT . pure $ parseMaybe parseJSON =<< versions ^? key pname
-    let (Just br) = bname <|> branch project <|> Just "master"
+    let br = fromMaybe "master" $ bname <|> branch project
     rev <- MaybeT $ responseBody <$> runReq def (r project br) >>=
         pure . (^? key "commit" . key "sha" . _String)
     sha256 <- lift $ getSha256 project { rev } extract
