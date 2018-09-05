@@ -28,7 +28,7 @@ import Prelude hiding (readFile, writeFile)
 import System.Environment (getArgs)
 import System.Process
 
-data Project = Project { owner, repo, rev, sha256 :: Text, branch :: Maybe Text}
+data Project = Project { owner, repo, rev, sha256 :: Text, branch :: Maybe Text }
     deriving (Generic, FromJSON, ToJSON)
 
 data Opts = Opts { fname :: FilePath, pname :: Text, bname :: Maybe Text, extract :: Bool }
