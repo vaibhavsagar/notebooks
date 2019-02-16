@@ -74,17 +74,16 @@ sentence = do
 
 newtype ParserC s t r = ParserC
     { unParserC :: Success s t r -> NextRes s t -> Parser s t }
-newtype Success s t r = Success
-    { unSuccess :: r -> NextRes s t -> Parser s t }
+type Success s t r = r -> NextRes s t -> Parser s t
 type NextRes s t = ParseResult s t
 
 symbolC :: Eq s => s -> ParserC s t s
-symbolC sym = ParserC $ \(Success sc) nc -> Parser $ \ss -> case ss of
+symbolC sym = ParserC $ \sc nc -> Parser $ \ss -> case ss of
     (s:ss) | s == sym -> unParser (sc sym nc) ss
     _                 -> nc
 
 satisfyC :: (s -> Bool) -> ParserC s t s
-satisfyC pred = ParserC $ \(Success sc) nc -> Parser $ \ss -> case ss of
+satisfyC pred = ParserC $ \sc nc -> Parser $ \ss -> case ss of
     (s:ss) | pred s -> unParser (sc s nc) ss
     _               -> nc
 
@@ -94,7 +93,7 @@ instance Functor (ParserC s t) where
 
 instance Applicative (ParserC s t) where
     pure :: r -> ParserC s t r
-    pure r = ParserC $ \(Success succ) next -> succ r next
+    pure r = ParserC $ \succ next -> succ r next
 
     (<*>) :: ParserC s t (u -> v) -> ParserC s t u -> ParserC s t v
     (<*>) = ap
@@ -111,11 +110,11 @@ instance Alternative (ParserC s t) where
 instance Monad (ParserC s t) where
     (>>=) :: ParserC s t u -> (u -> ParserC s t v) -> ParserC s t v
     (>>=) (ParserC p1) f =
-        ParserC $ \sc -> p1 $ Success $ \t -> unParserC (f t) sc
+        ParserC $ \sc -> p1 $ \t -> unParserC (f t) sc
 
 begin :: ParserC s t t -> Parser s t
 begin (ParserC p) = p
-    (Success $ \r (ParseResult nc) -> Parser $ \ss -> ParseResult ((ss,r):nc))
+    (\r (ParseResult nc) -> Parser $ \ss -> ParseResult ((ss,r):nc))
     (ParseResult [])
 
 wordC :: ParserC Char t String
@@ -140,7 +139,7 @@ infixr 4 >!<
 (>!<) :: ParserC s t r -> ParserC s t r -> ParserC s t r
 (>!<) (ParserC p1) (ParserC p2) = ParserC $ \sc nc -> Parser $ \ss ->
     unParser
-        (p1 (Success $ \r _ -> (unSuccess sc) r nc) (unParser (p2 sc nc) ss))
+        (p1 (\r _ -> sc r nc) (unParser (p2 sc nc) ss))
         ss
 
 (>!*<) :: ParserC s t r -> ParserC s t [r]
