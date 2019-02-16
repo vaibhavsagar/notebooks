@@ -1,3 +1,5 @@
 .stack-work
 .ipynb_checkpoints
 result
+dist
+dist-newstyle
