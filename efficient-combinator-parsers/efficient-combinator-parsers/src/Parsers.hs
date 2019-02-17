@@ -7,17 +7,17 @@ import Control.Monad (ap)
 import Data.Char
 
 newtype Parser s r = Parser { unParser :: ([s] -> ParseResult s r) }
-newtype ParseResult s r = ParseResult { unParseResult :: [([s], r)] }
+type ParseResult s r = [([s], r)]
 
 symbol :: Eq s => s -> Parser s s
 symbol sym = Parser p
-    where p (s:ss) | s == sym = ParseResult [(ss, sym)]
-          p _                 = ParseResult []
+    where p (s:ss) | s == sym = [(ss, sym)]
+          p _                 = []
 
 satisfy :: (s -> Bool) -> Parser s s
 satisfy pred = Parser p
-    where p (s:ss) | pred s = ParseResult [(ss, s)]
-          p _               = ParseResult []
+    where p (s:ss) | pred s = [(ss, s)]
+          p _               = []
 
 instance Functor (Parser s) where
     fmap :: (r -> t) -> Parser s r -> Parser s t
@@ -25,25 +25,24 @@ instance Functor (Parser s) where
 
 instance Applicative (Parser s) where
     pure :: r -> Parser s r
-    pure r = Parser $ \ss -> ParseResult [(ss,r)]
+    pure r = Parser $ \ss -> [(ss,r)]
 
     (<*>) :: Parser s (r -> t) -> Parser s r -> Parser s t
     (<*>) = ap
 
 instance Alternative (Parser s) where
     empty :: Parser s r
-    empty = Parser $ \_ -> ParseResult []
+    empty = Parser $ \_ -> []
 
     (<|>) :: Parser s r -> Parser s r -> Parser s r
-    (<|>) (Parser p1) (Parser p2) = Parser $ \ss ->
-        ParseResult $ unParseResult (p1 ss) ++ unParseResult (p2 ss)
+    (<|>) (Parser p1) (Parser p2) = Parser $ \ss -> (p1 ss) ++ (p2 ss)
 
 instance Monad (Parser s) where
     (>>=) :: Parser s r -> (r -> Parser s t) -> Parser s t
-    (>>=) (Parser p1) f = Parser $ \ss -> ParseResult
+    (>>=) (Parser p1) f = Parser $ \ss ->
         [ tuple
-        | (ssRest,result1) <- unParseResult $ p1 ss
-        , tuple            <- unParseResult $ (unParser $ f result1) ssRest
+        | (ssRest,result1) <- p1 ss
+        , tuple            <- (unParser $ f result1) ssRest
         ]
 
 aANDbORc :: Parser Char (Char, Char)
@@ -109,13 +108,10 @@ instance Alternative (ParserC s t) where
 
 instance Monad (ParserC s t) where
     (>>=) :: ParserC s t u -> (u -> ParserC s t v) -> ParserC s t v
-    (>>=) (ParserC p1) f =
-        ParserC $ \sc -> p1 $ \t -> unParserC (f t) sc
+    (>>=) (ParserC p1) f = ParserC $ \sc -> p1 $ \t -> unParserC (f t) sc
 
 begin :: ParserC s t t -> Parser s t
-begin (ParserC p) = p
-    (\r (ParseResult nc) -> Parser $ \ss -> ParseResult ((ss,r):nc))
-    (ParseResult [])
+begin (ParserC p) = p (\r nc -> Parser $ \ss -> ((ss,r):nc)) []
 
 wordC :: ParserC Char t String
 wordC = some (satisfyC isAlpha)
@@ -132,8 +128,8 @@ sentenceC = do
 infixr 4 <!>
 (<!>) :: Parser s r -> Parser s r -> Parser s r
 (<!>) (Parser p1) (Parser p2) = Parser $ \ss -> case p1 ss of
-    ParseResult [] -> p2 ss
-    r              -> r
+    [] -> p2 ss
+    r  -> r
 
 infixr 4 >!<
 (>!<) :: ParserC s t r -> ParserC s t r -> ParserC s t r
@@ -196,10 +192,7 @@ infixr 4 <<!>>
     unParser (p1 (\x xc2 -> sc x xc) (\ac3 -> unParser (p2 sc xc ac3) ss) ac) ss
 
 cBegin :: CParser s t t -> Parser s t
-cBegin (CParser p) = p
-    (\x xc ac -> Parser $ \ss -> ParseResult ((ss,x):unParseResult (xc ac)))
-    id
-    (ParseResult [])
+cBegin (CParser p) = p (\x xc ac -> Parser $ \ss -> ((ss,x):(xc ac))) id []
 
 cut :: CParser s t r -> CParser s t r
 cut (CParser p) = CParser $ \sc xc ac -> p sc id ac
