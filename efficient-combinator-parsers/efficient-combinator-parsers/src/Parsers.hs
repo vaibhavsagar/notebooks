@@ -204,8 +204,7 @@ cut (CParser p) = CParser $ \sc xc ac -> p sc id ac
 
 infixr 6 !>>=
 (!>>=) :: CParser s t u -> (u -> CParser s t v) -> CParser s t v
-(!>>=) (CParser p1) f = CParser $ \sc ->
-    p1 (\t ac2 -> unCParser (f t) sc id)
+(!>>=) (CParser p1) f = CParser $ \sc -> p1 (\t ac2 -> unCParser (f t) sc id)
 
 (<<!*>>) :: CParser s t r -> CParser s t [r]
 (<<!*>>) p = (p !>>= \r -> (\rs -> (r:rs)) <$> (<<!*>>) p) <<!>> pure []
