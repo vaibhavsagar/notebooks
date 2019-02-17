@@ -5,7 +5,7 @@ module Parsers where
 import Control.Applicative (Alternative(..))
 import Data.Char
 
-newtype Parser s r = Parser { unParser :: ([s] -> ParseResult s r) }
+newtype Parser s r = Parser { unParser :: [s] -> ParseResult s r }
 type ParseResult s r = [([s], r)]
 
 symbol :: Eq s => s -> Parser s s
@@ -39,7 +39,7 @@ instance Alternative (Parser s) where
     empty = Parser $ \_ -> []
 
     (<|>) :: Parser s r -> Parser s r -> Parser s r
-    (<|>) (Parser p1) (Parser p2) = Parser $ \ss -> (p1 ss) ++ (p2 ss)
+    (<|>) (Parser p1) (Parser p2) = Parser $ \ss -> p1 ss ++ p2 ss
 
 instance Monad (Parser s) where
     (>>=) :: Parser s r -> (r -> Parser s t) -> Parser s t
