@@ -3,7 +3,6 @@
 module Parsers where
 
 import Control.Applicative (Alternative(..))
-import Control.Monad (ap)
 import Data.Char
 
 newtype Parser s r = Parser { unParser :: ([s] -> ParseResult s r) }
@@ -28,7 +27,12 @@ instance Applicative (Parser s) where
     pure r = Parser $ \ss -> [(ss,r)]
 
     (<*>) :: Parser s (r -> t) -> Parser s r -> Parser s t
-    (<*>) = ap
+    (<*>) (Parser pf) (Parser pa) = Parser $ \ss ->
+        [ tuple
+        | (fs, f) <- pf ss
+        , (as, a) <- pa fs
+        , let tuple = (as, f a)
+        ]
 
 instance Alternative (Parser s) where
     empty :: Parser s r
@@ -95,7 +99,8 @@ instance Applicative (ParserC s t) where
     pure r = ParserC $ \succ next -> succ r next
 
     (<*>) :: ParserC s t (u -> v) -> ParserC s t u -> ParserC s t v
-    (<*>) = ap
+    (<*>) (ParserC pf) (ParserC pa) =
+        ParserC $ \sc -> pf $ \f -> pa $ \a -> sc (f a)
 
 instance Alternative (ParserC s t) where
     empty :: ParserC s t r
@@ -171,7 +176,8 @@ instance Applicative (CParser s t) where
     pure x = CParser $ \sc -> sc x
 
     (<*>) :: CParser s t (u -> v) -> CParser s t u -> CParser s t v
-    (<*>) = ap
+    (<*>) (CParser pf) (CParser pa) =
+        CParser $ \sc -> pf $ \f -> pa $ \a -> sc (f a)
 
 instance Alternative (CParser s t) where
     empty :: CParser s t r
@@ -183,8 +189,7 @@ instance Alternative (CParser s t) where
 
 instance Monad (CParser s t) where
     (>>=) :: CParser s t u -> (u -> CParser s t v) -> CParser s t v
-    (>>=) (CParser p1) f = CParser $ \sc ->
-        p1 $ \t -> unCParser (f t) sc
+    (>>=) (CParser p1) f = CParser $ \sc -> p1 $ \t -> unCParser (f t) sc
 
 infixr 4 <<!>>
 (<<!>>) :: CParser s t r -> CParser s t r -> CParser s t r
