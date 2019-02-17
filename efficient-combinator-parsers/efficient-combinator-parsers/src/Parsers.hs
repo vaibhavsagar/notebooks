@@ -107,9 +107,8 @@ instance Alternative (ParserC s t) where
     empty = ParserC $ \succ next -> Parser $ \ss -> next
 
     (<|>) :: ParserC s t r -> ParserC s t r -> ParserC s t r
-    (<|>) (ParserC p1) (ParserC p2) =
-        ParserC $ \sc nc -> Parser $ \ss ->
-            unParser (p1 sc (unParser (p2 sc nc) ss)) ss
+    (<|>) (ParserC p1) (ParserC p2) = ParserC $ \sc nc -> Parser $ \ss ->
+        unParser (p1 sc (unParser (p2 sc nc) ss)) ss
 
 instance Monad (ParserC s t) where
     (>>=) :: ParserC s t u -> (u -> ParserC s t v) -> ParserC s t v
