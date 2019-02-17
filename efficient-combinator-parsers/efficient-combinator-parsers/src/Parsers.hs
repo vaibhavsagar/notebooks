@@ -72,7 +72,7 @@ sep = some (satisfy isSpace <|> symbol ',')
 sentence :: Parser Char [String]
 sentence = do
     w <- word
-    r <- many (sep >>= \_ -> word)
+    r <- many (sep >> word)
     (\_ -> (w:r)) <$> symbol '.'
 
 newtype ParserC s t r = ParserC
@@ -126,7 +126,7 @@ sepC = some (satisfyC isSpace <|> symbolC ',')
 sentenceC :: ParserC Char t [String]
 sentenceC = do
     w <- wordC
-    r <- many (sepC >>= \_ -> wordC)
+    r <- many (sepC >> wordC)
     (\_ -> (w:r)) <$> symbolC '.'
 
 infixr 4 <!>
