@@ -153,7 +153,7 @@ infixr 4 >!<
 newtype CParser s t r = CParser
     { unCParser :: SucCont s t r -> XorCont s t -> AltCont s t -> Parser s t }
 type SucCont s t r = r -> XorCont s t -> AltCont s t -> Parser s t
-type XorCont s t =  AltCont s t -> ParseResult s t
+type XorCont s t = AltCont s t -> ParseResult s t
 type AltCont s t = ParseResult s t
 
 cSymbol :: Eq s => s -> CParser s t s
