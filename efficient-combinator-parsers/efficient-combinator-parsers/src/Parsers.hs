@@ -135,6 +135,16 @@ infixr 4 <!>
     [] -> p2 ss
     r  -> r
 
+(<!*>) :: Parser s r -> Parser s [r]
+(<!*>) p = (do
+    r <- p
+    (\rs -> (r:rs)) <$> (<!*>) p) <!> pure []
+
+(<!+>) :: Parser s r -> Parser s [r]
+(<!+>) p = do
+    r <- p
+    (\rs -> (r:rs)) <$> (<!*>) p
+
 infixr 4 >!<
 (>!<) :: ParserC s t r -> ParserC s t r -> ParserC s t r
 (>!<) (ParserC p1) (ParserC p2) = ParserC $ \sc nc -> Parser $ \ss ->

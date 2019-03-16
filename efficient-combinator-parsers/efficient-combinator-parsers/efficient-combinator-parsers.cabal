@@ -37,6 +37,7 @@ executable sentence
   build-depends:       base >=4.11 && <4.12
                      , efficient-combinator-parsers
   hs-source-dirs:      app
+  ghc-options:         -rtsopts
   default-language:    Haskell2010
 
 executable sentence-continuations
@@ -46,6 +47,7 @@ executable sentence-continuations
   build-depends:       base >=4.11 && <4.12
                      , efficient-combinator-parsers
   hs-source-dirs:      app
+  ghc-options:         -rtsopts
   default-language:    Haskell2010
 
 executable ad-hoc
@@ -55,4 +57,5 @@ executable ad-hoc
   build-depends:       base >=4.11 && <4.12
                      , efficient-combinator-parsers
   hs-source-dirs:      app
+  ghc-options:         -rtsopts
   default-language:    Haskell2010
