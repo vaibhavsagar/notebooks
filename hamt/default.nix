@@ -1,7 +1,7 @@
 let
   pkgs = import ../pkgs.nix;
 in import "${pkgs.ihaskell}/release.nix" {
-  compiler = "ghc822";
+  compiler = "ghc844";
   nixpkgs  = import pkgs.nixpkgs {};
   packages = self: with self; [ bytestring memory pretty-show timeit vector ];
 }
