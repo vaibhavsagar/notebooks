@@ -16,5 +16,5 @@ let
 in import "${pkgs.ihaskell}/release.nix" {
   nixpkgs = import pkgs.nixpkgs { config.allowBroken = true; overlays = [ overlay ]; };
   compiler = "ghc844";
-  packages = self: with self; [ ihaskell-charts ihaskell-diagrams ];
+  packages = self: with self; [ ihaskell-aeson ihaskell-blaze ihaskell-charts ihaskell-diagrams ];
 }
