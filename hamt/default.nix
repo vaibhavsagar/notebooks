@@ -3,5 +3,6 @@ let
 in import "${pkgs.ihaskell}/release.nix" {
   compiler = "ghc864";
   nixpkgs  = import pkgs.nixpkgs {};
-  packages = self: with self; [ bytestring memory pretty-show timeit vector ];
+  packages = self: with self; [ bytestring memory pretty-show timeit vector here ihaskell-graphviz ];
+  systemPackages = self: with self; [ graphviz ];
 }
