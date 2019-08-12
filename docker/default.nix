@@ -14,7 +14,6 @@ let
     contents =  [
       ihaskell
       nixpkgs.bashInteractive
-      nixpkgs.coreutils
     ];
     runAsRoot = ''
       #!${nixpkgs.runtimeShell}
