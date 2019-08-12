@@ -19,8 +19,7 @@ let
     runAsRoot = ''
       #!${nixpkgs.runtimeShell}
       ${nixpkgs.dockerTools.shadowSetup}
-      mkdir -p /tmp
-      chmod 1777 /tmp
+      mkdir -m 1777 /tmp
       mkdir -p /home/${NB_USER}
       ${nixpkgs.busybox}/bin/adduser --disabled-password --gecos "Default user" --uid ${NB_UID} ${NB_USER}
       chown -R ${NB_UID} /home/${NB_USER}
