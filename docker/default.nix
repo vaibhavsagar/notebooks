@@ -3,30 +3,41 @@ let
   nixpkgs = import pkgs.nixpkgs {};
   NB_USER = "jovyan";
   NB_UID = "1000";
+  dockerEtc = nixpkgs.runCommand "docker-etc" {} ''
+    mkdir -p $out/etc/pam.d
+
+    echo "root:x:0:0::/root:/bin/sh" > $out/etc/passwd
+    echo "jovyan:x:1000:1000::/home/jovyan:" >> $out/etc/passwd
+    echo "root:!x:::::::" > $out/etc/shadow
+    echo "jovyan:!:::::::" >> $out/etc/shadow
+
+    echo "root:x:0:" > $out/etc/group
+    echo "jovyan:x:1000:" >> $out/etc/group
+    echo "root:x::" > $out/etc/gshadow
+    echo "jovyan:!::" >> $out/etc/gshadow
+  '';
   ihaskell = import "${pkgs.ihaskell}/release.nix" {
     inherit nixpkgs;
     compiler = "ghc864";
     packages = self: with self; [];
   };
-  image = nixpkgs.dockerTools.buildImage {
+  image = nixpkgs.dockerTools.buildLayeredImage {
     name = "ihaskell-nix";
     tag = "latest";
     contents =  [
       ihaskell
       nixpkgs.bashInteractive
+      dockerEtc
     ];
-    runAsRoot = ''
-      #!${nixpkgs.runtimeShell}
-      ${nixpkgs.dockerTools.shadowSetup}
-      mkdir -m 1777 /tmp
-      mkdir -p /home/${NB_USER}
-      ${nixpkgs.busybox}/bin/adduser --disabled-password --gecos "Default user" --uid ${NB_UID} ${NB_USER}
-      chown -R ${NB_UID} /home/${NB_USER}
-    '';
     config = {
       Cmd = ["ihaskell-notebook" "--ip" "0.0.0.0"];
       User = NB_USER;
       WorkingDir = "/home/${NB_USER}";
     };
+    extraCommands = ''
+      mkdir -m 1777 ./tmp
+      mkdir -m 777 -p ./home/${NB_USER}
+    '';
+    maxLayers = 100;
   };
 in image
