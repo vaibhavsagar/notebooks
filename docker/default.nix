@@ -25,9 +25,9 @@ let
     name = "ihaskell-nix";
     tag = "latest";
     contents =  [
+      dockerEtc
       ihaskell
       nixpkgs.bashInteractive
-      dockerEtc
     ];
     config = {
       Cmd = ["ihaskell-notebook" "--ip" "0.0.0.0"];
