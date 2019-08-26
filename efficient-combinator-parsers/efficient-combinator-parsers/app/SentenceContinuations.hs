@@ -1,6 +1,7 @@
 module Main where
 
-import Parsers
+import Parser
+import ParserC
 import System.Environment
 
 main :: IO ()

@@ -16,6 +16,9 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:     Parsers
+                       Parser
+                       ParserC
+                       CParser
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.11 && <5
