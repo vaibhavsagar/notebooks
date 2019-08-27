@@ -15,8 +15,7 @@ build-type:          Simple
 cabal-version:       >=1.10
 
 library
-  exposed-modules:     Parsers
-                       Parser
+  exposed-modules:     Parser
                        ParserC
                        CParser
   -- other-modules:
