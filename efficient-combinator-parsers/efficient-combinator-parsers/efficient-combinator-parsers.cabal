@@ -25,14 +25,6 @@ library
   hs-source-dirs:      src
   default-language:    Haskell2010
 
-executable efficient-combinator-parsers
-  main-is:             Main.hs
-  -- other-modules:
-  -- other-extensions:
-  build-depends:       base >=4.11 && <5
-  hs-source-dirs:      app
-  default-language:    Haskell2010
-
 executable sentence
   main-is:             Sentence.hs
   -- other-modules:
