@@ -5,11 +5,11 @@ let
       packages = sup.haskell.packages // {
         ghc864 = sup.haskell.packages.ghc864.override {
           all-cabal-hashes = sel.fetchurl {
-            url = "https://github.com/commercialhaskell/all-cabal-hashes/archive/09dd3a69af0d88e0a8df6552b2398185a8740abf.tar.gz";
-            sha256 = "1xs6cc8zz5lff1bvzwn1sw076fislpxfk7zsyvwfp5hgl46bjhj6";
+            url = "https://github.com/commercialhaskell/all-cabal-hashes/archive/c5887c4a21b6bf7e2c8f338d55ec098206c51d0c.tar.gz";
+            sha256 = "1kvlyknysx7rqlsn9x765w8rckbb7rs6c9wr3vv6fazpjpdrg7dw";
           };
           overrides = self: super: {
-            sbv = self.callHackage "sbv" "8.3" {};
+            sbv = self.callHackage "sbv" "8.4" {};
           };
         };
       };
