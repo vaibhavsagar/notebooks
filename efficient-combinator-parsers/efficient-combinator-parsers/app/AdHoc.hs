@@ -1,3 +1,15 @@
+{-# OPTIONS_GHC
+    -O
+    -ddump-simpl
+    -dsuppress-idinfo
+    -dsuppress-coercions
+    -dsuppress-type-applications
+    -dsuppress-uniques
+    -dsuppress-module-prefixes
+    -ddump-to-file
+    -rtsopts
+#-}
+
 module Main where
 
 import Data.Char

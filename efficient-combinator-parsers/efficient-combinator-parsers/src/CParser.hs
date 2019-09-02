@@ -1,5 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# OPTIONS_GHC
+    -O
     -ddump-simpl
     -dsuppress-idinfo
     -dsuppress-coercions

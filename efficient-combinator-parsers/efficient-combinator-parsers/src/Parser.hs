@@ -1,5 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# OPTIONS_GHC
+    -O
     -ddump-simpl
     -dsuppress-idinfo
     -dsuppress-coercions
@@ -12,7 +13,6 @@
 module Parser where
 
 import Control.Applicative (Alternative(..))
-import Data.Char
 
 newtype Parser s r = Parser { unParser :: [s] -> ParseResult s r }
 type ParseResult s r = [([s], r)]
@@ -71,18 +71,6 @@ alpha = satisfy (\c -> elem c (['a'..'z']++['A'..'Z']))
 
 hex :: Parser Char Char
 hex = satisfy (\c -> elem c (['0'..'9']++['A'..'F']))
-
-word :: Parser Char String
-word = some (satisfy isAlpha)
-
-sep :: Parser Char String
-sep = some (satisfy isSpace <|> symbol ',')
-
-sentence :: Parser Char [String]
-sentence = do
-    w <- word
-    r <- many (sep >> word)
-    (\_ -> (w:r)) <$> symbol '.'
 
 infixr 4 <!>
 (<!>) :: Parser s r -> Parser s r -> Parser s r

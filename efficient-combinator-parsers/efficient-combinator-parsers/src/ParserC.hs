@@ -1,5 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# OPTIONS_GHC
+    -O
     -ddump-simpl
     -dsuppress-idinfo
     -dsuppress-coercions
@@ -12,7 +13,6 @@
 module ParserC where
 
 import Control.Applicative (Alternative(..))
-import Data.Char
 
 import Parser
 
@@ -57,19 +57,6 @@ instance Monad (ParserC s t) where
 
 begin :: ParserC s t t -> Parser s t
 begin (ParserC p) = p (\r nc -> Parser $ \ss -> ((ss,r):nc)) []
-
-wordC :: ParserC Char t String
-wordC = some (satisfyC isAlpha)
-
-sepC :: ParserC Char t String
-sepC = some (satisfyC isSpace <|> symbolC ',')
-
-sentenceC :: ParserC Char t [String]
-sentenceC = do
-    w <- wordC
-    r <- many (sepC >> wordC)
-    (\_ -> (w:r)) <$> symbolC '.'
-
 
 infixr 4 >!<
 (>!<) :: ParserC s t r -> ParserC s t r -> ParserC s t r
