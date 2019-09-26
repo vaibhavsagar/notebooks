@@ -3,11 +3,14 @@ let
   overlay = sel: sup: {
     haskell = sup.haskell // {
       packages = sup.haskell.packages // {
-        ghc844 = sup.haskell.packages.ghc844.override {
+        ghc864 = sup.haskell.packages.ghc864.override {
+          all-cabal-hashes = sel.fetchurl {
+            url = "https://github.com/commercialhaskell/all-cabal-hashes/archive/c5887c4a21b6bf7e2c8f338d55ec098206c51d0c.tar.gz";
+            sha256 = "1kvlyknysx7rqlsn9x765w8rckbb7rs6c9wr3vv6fazpjpdrg7dw";
+          };
           overrides = self: super: {
-            system-fileio = sel.haskell.lib.doJailbreak super.system-fileio;
-            Chart = sel.haskell.lib.doJailbreak super.Chart;
-            Chart-cairo = sel.haskell.lib.doJailbreak super.Chart-cairo;
+            Chart = self.callHackage "Chart" "1.9.1" {};
+            Chart-cairo = self.callHackage "Chart-cairo" "1.9.1" {};
           };
         };
       };
@@ -15,6 +18,6 @@ let
   };
 in import "${pkgs.ihaskell}/release.nix" {
   nixpkgs = import pkgs.nixpkgs { config.allowBroken = true; overlays = [ overlay ]; };
-  compiler = "ghc844";
+  compiler = "ghc864";
   packages = self: with self; [ ihaskell-aeson ihaskell-blaze ihaskell-charts ihaskell-diagrams ];
 }
