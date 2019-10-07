@@ -44,6 +44,7 @@ data HAMT key value
     | Leaf Hash key value
     | Many Bitmap (Vector (HAMT key value))
     | Full (Vector (HAMT key value))
+    | Coll Hash (Vector (key, value))
     deriving (Show)
 
 empty :: HAMT key value
@@ -76,14 +77,17 @@ updateAt vector index a = vector // [(index, a)]
 deleteAt :: Vector a -> Int -> Vector a
 deleteAt vector index = take index vector <> drop (index+1) vector
 
-insert :: Hashable key => key -> value -> HAMT key value -> HAMT key value
+insert :: (Hashable key, Eq key) => key -> value -> HAMT key value -> HAMT key value
 insert key value hamt = insert' 0 (hash key) key value hamt
 
-insert' :: Shift -> Hash -> key -> value -> HAMT key value -> HAMT key value
+insert' :: Eq key => Shift -> Hash -> key -> value -> HAMT key value -> HAMT key value
 insert' shift hash key value None = Leaf hash key value
 
 insert' shift hash key value leaf@(Leaf leafHash leafKey leafValue)
-    | hash == leafHash = Leaf hash key value
+    | hash == leafHash =
+        if key == leafKey
+        then Leaf hash key value
+        else Coll hash (insertAt (singleton (leafKey, leafValue)) 0 (key, value))
     | otherwise = insert' shift hash key value (Many (bitMask leafHash shift) (singleton leaf))
 
 insert' shift hash key value (Many bitmap vector)
@@ -112,29 +116,53 @@ insert' shift hash key value (Full vector) =
     where
         index = subkey hash shift
 
-fromList :: Hashable key => [(key, value)] -> HAMT key value
+insert' shift hash key value coll@(Coll collHash vector)
+    | hash == collHash = Coll collHash (updateOrPrepend 0 (length vector) key value vector)
+    | otherwise = insert' shift hash key value (Many (bitMask collHash shift) (singleton coll))
+    where
+        updateOrPrepend index len key value vector
+            | index == len = insertAt vector 0 (key, value)
+            | otherwise = let
+                (currKey, _) = vector ! index
+                in if currKey == key
+                    then updateAt vector index (key, value)
+                    else updateOrPrepend (index+1) len key value vector
+
+fromList :: (Hashable key, Eq key) => [(key, value)] -> HAMT key value
 fromList = foldr (uncurry insert) empty
 
-lookup :: Hashable key => key -> HAMT key value -> Maybe value
-lookup key hamt = lookup' 0 (hash key) hamt
+lookup :: (Hashable key, Eq key) => key -> HAMT key value -> Maybe value
+lookup key hamt = lookup' 0 (hash key) key hamt
 
-lookup' :: Shift -> Hash -> HAMT key value -> Maybe value
-lookup' shift hash None = Nothing
+lookup' :: Eq key => Shift -> Hash -> key -> HAMT key value -> Maybe value
+lookup' shift hash key None = Nothing
 
-lookup' shift hash (Leaf leafHash leafKey leafValue)
-    | hash == leafHash = Just leafValue
+lookup' shift hash key (Leaf leafHash leafKey leafValue)
+    | hash == leafHash && key == leafKey = Just leafValue
     | otherwise = Nothing
 
-lookup' shift hash (Many bitmap vector)
+lookup' shift hash key (Many bitmap vector)
     | bitmap .&. mask == 0 = Nothing
-    | otherwise = lookup' (shift+bitsPerSubkey) hash (vector ! index)
+    | otherwise = lookup' (shift+bitsPerSubkey) hash key (vector ! index)
     where
         mask = bitMask hash shift
         index = maskIndex bitmap mask
 
-lookup' shift hash (Full vector) = lookup' (shift+bitsPerSubkey) hash (vector ! index)
+lookup' shift hash key (Full vector) = lookup' (shift+bitsPerSubkey) hash key (vector ! index)
     where
         index = subkey hash shift
+
+lookup' shift hash key (Coll collHash vector)
+    | hash == collHash = findMatching 0 (length vector) key vector
+    | otherwise = Nothing
+    where
+        findMatching index len key vector
+            | index == len = Nothing
+            | otherwise = let
+                (currKey, currValue) = vector ! index
+                in if currKey == key
+                    then Just currValue
+                    else findMatching (index+1) len key vector
 
 fibSlow :: Int -> Int
 fibSlow 0 = 1
@@ -157,21 +185,21 @@ fib' table n = case lookup n table of
 fibFast :: Int -> Integer
 fibFast n = fst $ fib' empty n
 
-delete :: Hashable key => key -> HAMT key value -> HAMT key value
-delete key hamt = delete' 0 (hash key) hamt
+delete :: (Hashable key, Eq key) => key -> HAMT key value -> HAMT key value
+delete key hamt = delete' 0 (hash key) key hamt
 
-delete' :: Shift -> Hash -> HAMT key value -> HAMT key value
-delete' shift hash None = None
+delete' :: Eq key => Shift -> Hash -> key -> HAMT key value -> HAMT key value
+delete' shift hash key None = None
 
-delete' shift hash leaf@(Leaf leafHash leafKey leafValue)
-    | hash == leafHash = None
+delete' shift hash key leaf@(Leaf leafHash leafKey leafValue)
+    | hash == leafHash && key == leafKey = None
     | otherwise = leaf
 
-delete' shift hash many@(Many bitmap vector)
+delete' shift hash key many@(Many bitmap vector)
     | bitmap .&. mask == 0 = many
     | otherwise = let
         subtree = vector ! index
-        subtree' = delete' (shift+bitsPerSubkey) hash subtree
+        subtree' = delete' (shift+bitsPerSubkey) hash key subtree
         in case subtree' of
             None -> if length vector == 1
                 then None
@@ -184,16 +212,32 @@ delete' shift hash many@(Many bitmap vector)
         mask = bitMask hash shift
         index = maskIndex bitmap mask
 
-delete' shift hash full@(Full vector) =
+delete' shift hash key (Full vector) =
     let
         subtree = vector ! index
-        subtree' = delete' (shift+bitsPerSubkey) hash subtree
+        subtree' = delete' (shift+bitsPerSubkey) hash key subtree
     in case subtree' of
         None -> Many (fullMask .&. complement mask) (deleteAt vector index)
         _ -> Full (updateAt vector index subtree')
     where
         mask = bitMask hash shift
         index = subkey hash shift
+
+delete' shift hash key coll@(Coll collHash vector)
+    | hash == collHash = let
+        vector' = deleteMatching 0 (length vector) key vector
+        in if length vector' == 1
+            then (\(leafKey, leafValue) -> Leaf collHash leafKey leafValue) $ vector' ! 0
+            else Coll collHash vector'
+    | otherwise = coll
+    where
+        deleteMatching index len key vector
+            | index == len = vector
+            | otherwise = let
+                (currKey, _) = vector ! index
+                in if currKey == key
+                    then deleteAt vector index
+                    else deleteMatching (index+1) len key vector
 
 main :: IO ()
 main = do
