@@ -182,7 +182,7 @@ delete' shift hash many@(Many bitmap vector)
             _ -> Many bitmap (updateAt vector index subtree')
     where
         mask = bitMask hash shift
-        index = subkey hash shift
+        index = maskIndex bitmap mask
 
 delete' shift hash full@(Full vector) =
     let
