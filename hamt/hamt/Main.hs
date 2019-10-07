@@ -43,6 +43,7 @@ data HAMT key value
     = None
     | Leaf Hash key value
     | Many Bitmap (Vector (HAMT key value))
+    | Full (Vector (HAMT key value))
     deriving (Show)
 
 empty :: HAMT key value
@@ -53,6 +54,9 @@ bitsPerSubkey = 4
 
 subkeyMask :: Bitmap
 subkeyMask = (bit bitsPerSubkey) - 1
+
+fullMask :: Bitmap
+fullMask = (bit (2^bitsPerSubkey)) - 1
 
 subkey :: Hash -> Shift -> Int
 subkey hash shift = fromIntegral $ (fromIntegral $ shiftR hash shift) .&. subkeyMask
@@ -87,7 +91,9 @@ insert' shift hash key value (Many bitmap vector)
         leaf = Leaf hash key value
         vector' = insertAt vector index leaf
         bitmap' = bitmap .|. mask
-        in Many bitmap' vector'
+        in if bitmap' == fullMask
+          then Full vector'
+          else Many bitmap' vector'
     | otherwise = let
         subtree = vector ! index
         subtree' = insert' (shift+bitsPerSubkey) hash key value subtree
@@ -96,6 +102,15 @@ insert' shift hash key value (Many bitmap vector)
     where
         mask = bitMask hash shift
         index = maskIndex bitmap mask
+
+insert' shift hash key value (Full vector) =
+    let
+        subtree = vector ! index
+        subtree' = insert' (shift+bitsPerSubkey) hash key value subtree
+        vector' = updateAt vector index subtree'
+    in Full vector'
+    where
+        index = subkey hash shift
 
 fromList :: Hashable key => [(key, value)] -> HAMT key value
 fromList = foldr (uncurry insert) empty
@@ -117,6 +132,10 @@ lookup' shift hash (Many bitmap vector)
         mask = bitMask hash shift
         index = maskIndex bitmap mask
 
+lookup' shift hash (Full vector) = lookup' (shift+bitsPerSubkey) hash (vector ! index)
+    where
+        index = subkey hash shift
+
 fibSlow :: Int -> Int
 fibSlow 0 = 1
 fibSlow 1 = 1
@@ -125,7 +144,7 @@ fibSlow n = fibSlow (n-1) + fibSlow (n-2)
 instance Hashable Int where
     hash int = Binary (fromIntegral int)
 
-fib' :: HAMT Int Int -> Int -> (Int, HAMT Int Int)
+fib' :: HAMT Int Integer -> Int -> (Integer, HAMT Int Integer)
 fib' table 0 = (1, insert 0 1 table)
 fib' table 1 = (1, insert 1 1 table)
 fib' table n = case lookup n table of
@@ -135,7 +154,7 @@ fib' table n = case lookup n table of
         (i2, table'') = fib' table' (n-2)
         in (i1 + i2, insert n (i1 + i2) table'')
 
-fibFast :: Int -> Int
+fibFast :: Int -> Integer
 fibFast n = fst $ fib' empty n
 
 delete :: Hashable key => key -> HAMT key value -> HAMT key value
@@ -160,10 +179,21 @@ delete' shift hash many@(Many bitmap vector)
             Leaf{} -> if length vector == 1
                 then subtree'
                 else Many bitmap (updateAt vector index subtree')
-            _ ->     Many bitmap (updateAt vector index subtree')
+            _ -> Many bitmap (updateAt vector index subtree')
     where
         mask = bitMask hash shift
-        index = maskIndex bitmap mask
+        index = subkey hash shift
+
+delete' shift hash full@(Full vector) =
+    let
+        subtree = vector ! index
+        subtree' = delete' (shift+bitsPerSubkey) hash subtree
+    in case subtree' of
+        None -> Many (fullMask .&. complement mask) (deleteAt vector index)
+        _ -> Full (updateAt vector index subtree')
+    where
+        mask = bitMask hash shift
+        index = subkey hash shift
 
 main :: IO ()
 main = do
