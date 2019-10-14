@@ -10,7 +10,7 @@ let
   overlay = sel: sup: {
     haskell = sup.haskell // {
       packages = sup.haskell.packages // {
-        ghc864 = sup.haskell.packages.ghc864.override {
+        ghc865 = sup.haskell.packages.ghc865.override {
           overrides = self: super: {
             hlint = self.callHackage "hlint" "2.1.14" {};
           };
@@ -20,7 +20,7 @@ let
   };
 in import "${ihaskell}/release.nix" {
   nixpkgs = import nixpkgs { config.allowBroken = true; overlays = [ overlay ]; };
-  compiler = "ghc864";
+  compiler = "ghc865";
   packages = self: with self; [ llvm-hs llvm-hs-pure_8_0_0 ];
   systemPackages = self: with self; [ llvm_8 ];
 }

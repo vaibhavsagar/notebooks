@@ -18,7 +18,7 @@ let
   '';
   ihaskell = import "${pkgs.ihaskell}/release.nix" {
     inherit nixpkgs;
-    compiler = "ghc864";
+    compiler = "ghc865";
     packages = self: with self; [];
   };
   image = nixpkgs.dockerTools.buildLayeredImage {

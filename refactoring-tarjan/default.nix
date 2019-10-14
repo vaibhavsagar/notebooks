@@ -1,7 +1,7 @@
 let
   pkgs = import ../pkgs.nix;
 in import "${pkgs.ihaskell}/release.nix" {
-  compiler = "ghc864";
+  compiler = "ghc865";
   nixpkgs  = import pkgs.nixpkgs {};
   packages = self: with self; [ containers transformers vector ];
 }
