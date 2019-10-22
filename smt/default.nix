@@ -10,6 +10,7 @@ let
           };
           overrides = self: super: {
             sbv = self.callHackage "sbv" "8.4" {};
+            z3 = sel.haskell.lib.dontCheck super.z3;
           };
         };
       };
@@ -17,7 +18,7 @@ let
   };
 in import "${pkgs.ihaskell}/release.nix" {
   compiler = "ghc865";
-  nixpkgs  = import pkgs.nixpkgs { overlays = [ overlay ]; };
+  nixpkgs  = import pkgs.nixpkgs { overlays = [ overlay ]; config.allowBroken = true; };
   packages = self: with self; [ sbv ];
   systemPackages = self: with self; [ z3 ];
 }
