@@ -3,8 +3,8 @@
     "owner": "gibiansky",
     "repo": "IHaskell",
     "branch": "master",
-    "rev": "aee398a82fb87146c39902dbefea723d1799292e",
-    "sha256": "0fdw393cvgrl91ya9sn6l4q6ikl15ia0gghadwwdc7f44bvgipi4"
+    "rev": "a442c0b6d4cf1fb17eaa3bf2827f04b21ad334bf",
+    "sha256": "0fprbj4g02wn8600siwy4wizz8qx4imsvlvkr36p2ndmrpsynbbl"
   },
   "nixpkgs": {
     "owner": "NixOS",
