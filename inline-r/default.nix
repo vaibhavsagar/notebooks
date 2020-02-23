@@ -23,7 +23,7 @@ let
   } ''echo $R_LIBS_SITE > $out'';
 
   ihaskellEnv = (import "${pkgs.ihaskell}/release.nix" {
-    compiler = "ghc865";
+    compiler = "ghc864";
     nixpkgs  = nixpkgs;
     packages = self: [ self.inline-r ];
   }).passthru.ihaskellEnv;
