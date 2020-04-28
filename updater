@@ -14,7 +14,7 @@ DEFAULT_BRANCH=$(jq -r '.[$project].branch // "master"' --arg project "$PROJECT"
 BRANCH=${3:-$DEFAULT_BRANCH}
 
 REV=$(curl "https://api.github.com/repos/$OWNER/$REPO/branches/$BRANCH" | jq -r '.commit.sha')
-SHA256=$(nix-prefetch-url --unpack "https://github.com/$OWNER/$REPO/archive/$REV.tar.gz")
+SHA256=$(nix-prefetch-url --unpack "https://github.com/$OWNER/$REPO/tarball/$REV")
 TJQ=$(jq '.[$project] = {owner: $owner, repo: $repo, branch: $branch, rev: $rev, sha256: $sha256}' \
   --arg project "$PROJECT" \
   --arg owner "$OWNER" \
