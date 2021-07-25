@@ -10,7 +10,7 @@
     "owner": "NixOS",
     "repo": "nixpkgs",
     "branch": "nixos-21.05",
-    "rev": "c06613c25df3fe1dd26243847a3c105cf6770627",
-    "sha256": "16si1436wf3fcx91p6cy3qxaib8kr78qivbi69lq4m63n96gglkv"
+    "rev": "973910f5c31b9ba6c171c33a8bd7199990b14c72",
+    "sha256": "1n1kibmn1fcjazaxp8lydwdx646lknqksv5b2fm33fdq2dvafvj7"
   }
 }
