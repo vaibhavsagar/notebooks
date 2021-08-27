@@ -1,0 +1,21 @@
+name: "Build"
+on:
+  push:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v13
+      with:
+        skip_adding_nixpkgs_channel: true
+    - uses: cachix/cachix-action@v10
+      with:
+        name: vaibhavsagar
+        signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+    - run: nix-build
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        TARGET_REPO: ${{ github.repository }}
+        RUN_NUMBER: ${{ github.run_number }}
+        WORKFLOW: ${{ github.workflow }}
