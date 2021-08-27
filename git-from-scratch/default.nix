@@ -19,7 +19,7 @@ let
     nixpkgs.haskellPackages.callCabal2nix "git-from-scratch" (builtins.filterSource cleanSource ./.) {};
 in import "${pkgs.ihaskell}/release.nix" {
   inherit nixpkgs;
-  compiler = "ghc865";
+  compiler = "ghc8104";
   packages = self: with self; [
     SHA
     attoparsec

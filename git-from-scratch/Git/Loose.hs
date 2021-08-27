@@ -13,6 +13,7 @@ import           Data.ByteString.Base16                (encode, decode)
 import           Data.ByteString.Lazy                  (fromStrict, toStrict)
 import           Data.ByteString.UTF8                  (fromString, toString)
 import           Data.Digest.Pure.SHA
+import           Data.Either                           (fromRight)
 import           Data.Monoid                           ((<>), mconcat)
 import           System.Directory                      (doesPathExist, createDirectoryIfMissing)
 import           System.FilePath                       ((</>), takeDirectory)
@@ -63,7 +64,7 @@ instance Byteable Commit where
         ]
 
 instance Byteable TreeEntry where
-    toBytes (TreeEntry perms name ref) = mconcat [perms, " ", name, "\NUL", fst $ decode ref]
+    toBytes (TreeEntry perms name ref) = mconcat [perms, " ", name, "\NUL", fromRight (error "Invalid base16") $ decode ref]
 
 instance Byteable Tree where
     toBytes (Tree entries) = mconcat (map toBytes entries)
