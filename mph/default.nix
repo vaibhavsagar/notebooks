@@ -1,7 +1,7 @@
 let
   pkgs = import ../pkgs.nix;
 in import "${pkgs.ihaskell}/release.nix" {
-  compiler = "ghc884";
+  compiler = "ghc8104";
   nixpkgs  = import pkgs.nixpkgs {};
   packages = self: with self; [ bv-little unordered-containers ];
 }
