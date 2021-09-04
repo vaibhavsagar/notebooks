@@ -21,7 +21,6 @@ in nixpkgs.linkFarm "notebooks" (notebooks [
   "inline-r"
   "intmap"
   "lambda"
-  "llvm"
   "mph"
   "refactoring-tarjan"
   "revisiting-monadic-parsing-haskell"
