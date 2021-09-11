@@ -18,7 +18,6 @@ in nixpkgs.linkFarm "notebooks" (notebooks [
   "graphviz"
   "hamt"
   "hs-updater"
-  "inline-r"
   "intmap"
   "lambda"
   "mph"
