@@ -34,10 +34,10 @@ let
       User = NB_USER;
       WorkingDir = "/home/${NB_USER}";
     };
-    extraCommands = ''
+    fakeRootCommands = ''
       mkdir -m 1777 ./tmp
       mkdir -m 777 -p ./home/${NB_USER}
+      chown -R ${NB_UID} ./home/${NB_USER}
     '';
-    maxLayers = 100;
   };
 in image
