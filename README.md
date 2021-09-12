@@ -6,7 +6,7 @@ e.g. `continuations`, you can do this:
 
 ```bash
 $ cd continuations
-$ $(nix-build)/bin/ihaskell-notebook
+$ $(nix-build)/bin/jupyter-notebook
 <...>
 ```
 
