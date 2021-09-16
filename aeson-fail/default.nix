@@ -3,26 +3,15 @@ let
     inherit sha256;
     url = "https://github.com/${owner}/${repo}/tarball/${rev}";
   };
-  overlay = sel: sup: {
-    haskell = sup.haskell // {
-      packages = sup.haskell.packages // {
-        ghc844 = sup.haskell.packages.ghc844.override {
-          overrides = self: super: {
-            zeromq4-haskell = sel.haskell.lib.dontCheck super.zeromq4-haskell;
-          };
-        };
-      };
-    };
-  };
   nixpkgs = import (fetcher {
     owner = "NixOS";
     repo = "nixpkgs";
-    rev = "a7e559a5504572008567383c3dc8e142fa7a8633";
-    sha256 = "16j95q58kkc69lfgpjkj76gw5sx8rcxwi3civm0mlfaxxyw9gzp6";
-  }) { overlays = [ overlay ]; };
+    rev = "75f4ba05c63be3f147bcc2f7bd4ba1f029cedcb1";
+    sha256 = "157c64220lf825ll4c0cxsdwg7cxqdx4z559fdp7kpz0g6p8fhhr";
+  }) { overlays = [ ]; config.allowBroken = true; };
   pkgs = import ../pkgs.nix;
 in import "${pkgs.ihaskell}/release.nix" {
   inherit nixpkgs;
-  compiler = "ghc844";
+  compiler = "ghc865";
   packages = haskellPackages: [ haskellPackages.aeson ];
 }
