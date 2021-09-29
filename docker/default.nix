@@ -20,6 +20,7 @@ let
     inherit nixpkgs;
     compiler = "ghc8104";
     packages = self: with self; [];
+    staticExecutable = true;
   };
   image = nixpkgs.dockerTools.buildLayeredImage {
     name = "ihaskell-nix";
