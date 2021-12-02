@@ -1,6 +1,6 @@
 let
   pkgs = import ../pkgs.nix;
 in import "${pkgs.ihaskell}/release.nix" {
-  compiler = "ghc8104";
+  compiler = "ghc8107";
   nixpkgs  = import pkgs.nixpkgs {};
 }
