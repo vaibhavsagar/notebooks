@@ -3,14 +3,14 @@
     "owner": "gibiansky",
     "repo": "IHaskell",
     "branch": "master",
-    "rev": "7e69c7e176ba234d29a57fcdff8d1bba04e34ab4",
-    "sha256": "0ry2l1g5z04n5l3991p361fs9andbr7disiwamx09sbx0cn7wwm2"
+    "rev": "c78143d4a4e3669ddf55724498ca39a9c8585b88",
+    "sha256": "09d8lyxx8vnaqiwnnrsgsw6kncfq7hr3qi518z1m24ggs7a4krhw"
   },
   "nixpkgs": {
     "owner": "NixOS",
     "repo": "nixpkgs",
     "branch": "nixos-21.11",
-    "rev": "a640d8394f34714578f3e6335fc767d0755d78f9",
-    "sha256": "1dyyzgcmlhpsdb4ngiy8m0x10qmh0r56ky75r8ppvvh730m3lhfj"
+    "rev": "3ddd960a3b575bf3230d0e59f42614b71f9e0db9",
+    "sha256": "1sk60h584gfdf5ql3mv4hps6jly6yj6dc5fbkfkh082z1c8885vk"
   }
 }
