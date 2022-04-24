@@ -1,10 +1,10 @@
 {
   "ihaskell": {
-    "owner": "gibiansky",
+    "owner": "IHaskell",
     "repo": "IHaskell",
     "branch": "master",
-    "rev": "c78143d4a4e3669ddf55724498ca39a9c8585b88",
-    "sha256": "09d8lyxx8vnaqiwnnrsgsw6kncfq7hr3qi518z1m24ggs7a4krhw"
+    "rev": "27753904f453fe2d06371771eeeb20d47bcae554",
+    "sha256": "02g4pr50ni44vdh9azxxbnv2d0w7g0v68llfx7k2bkc3f9k64m5w"
   },
   "nixpkgs": {
     "owner": "NixOS",
