@@ -18,7 +18,7 @@ let
   '';
   ihaskell = import "${pkgs.ihaskell}/release.nix" {
     inherit nixpkgs;
-    compiler = "ghc902";
+    compiler = "ghc928";
     packages = self: with self; [];
     staticExecutable = true;
   };
