@@ -3,7 +3,7 @@ let
   overlay = sel: sup: {
     haskell = sup.haskell // {
       packages = sup.haskell.packages // {
-        ghc928 = sup.haskell.packages.ghc902.override {
+        ghc928 = sup.haskell.packages.ghc928.override {
           overrides = self: super: {
             bv-little = sel.haskell.lib.dontCheck super.bv-little;
           };
