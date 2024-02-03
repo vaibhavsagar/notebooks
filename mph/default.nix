@@ -1,18 +1,20 @@
 let
   pkgs = import ../pkgs.nix;
   overlay = sel: sup: {
+    nix-filter = import pkgs.nix-filter;
     haskell = sup.haskell // {
       packages = sup.haskell.packages // {
-        ghc928 = sup.haskell.packages.ghc928.override {
+        ghc948 = sup.haskell.packages.ghc948.override {
           overrides = self: super: {
-            bv-little = sel.haskell.lib.dontCheck super.bv-little;
+            ghc-syntax-highlighter = self.ghc-syntax-highlighter_0_0_10_0;
           };
         };
       };
     };
   };
-in import "${pkgs.ihaskell}/release.nix" {
-  compiler = "ghc928";
-  nixpkgs  = import pkgs.nixpkgs { overlays = [ overlay ]; config.allowBroken = true; };
+  nixpkgs = (import pkgs.nixpkgs { overlays = [ overlay ]; config.allowBroken = true; });
+  jupyterlab = nixpkgs.python3.withPackages (ps: [ ps.jupyterlab ps.notebook ]);
+in nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc948"; }{
+  extraEnvironmentBinaries = [ jupyterlab ];
   packages = self: with self; [ bv-little unordered-containers ];
 }

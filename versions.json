@@ -3,14 +3,21 @@
     "owner": "IHaskell",
     "repo": "IHaskell",
     "branch": "master",
-    "rev": "72e663bcc1af12fc136d19941cf21efdf7341379",
-    "sha256": "0f4szzhqinjpx1ns3r3hlzslnp79mnsp62d2yad220p2xz3yn9ar"
+    "rev": "fa03e29a1d520890b4e48982f13cab240a97ae1b",
+    "sha256": "0amh81hnsbi551cswajdxgwnr2sj503mjdsq39qc4k45i4c39hsl"
   },
   "nixpkgs": {
     "owner": "NixOS",
     "repo": "nixpkgs",
-    "branch": "nixos-23.05",
-    "rev": "a16f7eb56e88c8985fcc6eb81dabd6cade4e425a",
-    "sha256": "0a0dnbsbblh4wps0lzzxv3gfphscv6bqjc77lkr58xkzcijjdlv2"
+    "branch": "nixos-23.11",
+    "rev": "d7f206b723e42edb09d9d753020a84b3061a79d8",
+    "sha256": "1k5vysfkipdma85596d6xa6glihqqsl9ypnaqiwg6hmsvfb5y6l8"
+  },
+  "nix-filter": {
+    "owner": "numtide",
+    "repo": "nix-filter",
+    "branch": "main",
+    "rev": "c843418ecfd0344ecb85844b082ff5675e02c443",
+    "sha256": "072xsy3i54snnbgkdf2vrcssg0zb80fipgb5y2c78r2n5ddpnv9g"
   }
 }

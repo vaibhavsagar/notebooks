@@ -1,6 +1,19 @@
 let
   pkgs = import ../pkgs.nix;
-  nixpkgs = import pkgs.nixpkgs {};
+  overlay = sel: sup: {
+    nix-filter = import pkgs.nix-filter;
+    haskell = sup.haskell // {
+      packages = sup.haskell.packages // {
+        ghc948 = sup.haskell.packages.ghc948.override {
+          overrides = self: super: {
+            ghc-syntax-highlighter = self.ghc-syntax-highlighter_0_0_10_0;
+          };
+        };
+      };
+    };
+  };
+  nixpkgs = (import pkgs.nixpkgs { overlays = [ overlay ]; });
+  jupyterlab = nixpkgs.python3.withPackages (ps: [ ps.jupyterlab ps.notebook ]);
   NB_USER = "jovyan";
   NB_UID = "1000";
   dockerEtc = nixpkgs.runCommand "docker-etc" {} ''
@@ -16,10 +29,9 @@ let
     echo "root:x::" > $out/etc/gshadow
     echo "jovyan:!::" >> $out/etc/gshadow
   '';
-  ihaskell = import "${pkgs.ihaskell}/release.nix" {
-    inherit nixpkgs;
-    compiler = "ghc928";
+  ihaskell = nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc948"; }{
     packages = self: with self; [];
+    extraEnvironmentBinaries = [jupyterlab];
     staticExecutable = true;
   };
   image = nixpkgs.dockerTools.buildLayeredImage {
