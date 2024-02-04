@@ -36,6 +36,7 @@
         "git-from-scratch"
         "graphviz"
         "hamt"
+        "higher-kinded-data"
         "hs-updater"
         "intmap"
         "lambda"
