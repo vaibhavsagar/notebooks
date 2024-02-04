@@ -1,33 +1,10 @@
-let
-  pkgs    = import ./pkgs.nix;
-  nixpkgs = import pkgs.nixpkgs {};
-  notebooks = map (folder: {
-    name = folder;
-    path = import (./. + "/${folder}");
-  });
-in nixpkgs.linkFarm "notebooks" (notebooks [
-  "callcc"
-  "chart-diagrams"
-  "codensity"
-  "continuations"
-  "deriving-via"
-  "docker"
-  "dragon-curve"
-  "efficient-combinator-parsers"
-  "git-from-scratch"
-  "graphviz"
-  "hamt"
-  "hs-updater"
-  "intmap"
-  "lambda"
-  "mph"
-  "refactoring-tarjan"
-  "revisiting-monadic-parsing-haskell"
-  "revisiting-poor-mans-concurrency"
-  "smt"
-  "solver"
-  "tarjan"
-  "trees-that-shrink"
-  "typeclasses"
-  "zulip-api"
-])
+(import
+  (
+    let lock = builtins.fromJSON (builtins.readFile ./flake.lock); in
+    fetchTarball {
+      url = lock.nodes.flake-compat.locked.url or "https://github.com/edolstra/flake-compat/archive/${lock.nodes.flake-compat.locked.rev}.tar.gz";
+      sha256 = lock.nodes.flake-compat.locked.narHash;
+    }
+  )
+  { src = ./.; }
+).defaultNix

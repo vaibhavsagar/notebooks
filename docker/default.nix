@@ -1,3 +1,4 @@
+{ system ? builtins.currentSystem }:
 let
   pkgs = import ../pkgs.nix;
   overlay = sel: sup: {
@@ -12,7 +13,7 @@ let
       };
     };
   };
-  nixpkgs = (import pkgs.nixpkgs { overlays = [ overlay ]; });
+  nixpkgs = (import pkgs.nixpkgs { inherit system; overlays = [ overlay ]; });
   jupyterlab = nixpkgs.python3.withPackages (ps: [ ps.jupyterlab ps.notebook ]);
   NB_USER = "jovyan";
   NB_UID = "1000";
