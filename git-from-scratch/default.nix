@@ -1,3 +1,4 @@
+{ system ? builtins.currentSystem }:
 let
   pkgs = import ../pkgs.nix;
   overlay = sel: sup: {
@@ -12,7 +13,7 @@ let
       };
     };
   };
-  nixpkgs = (import pkgs.nixpkgs { overlays = [ overlay ]; });
+  nixpkgs = (import pkgs.nixpkgs { inherit system; overlays = [ overlay ]; });
   jupyterlab = nixpkgs.python3.withPackages (ps: [ ps.jupyterlab ps.notebook ]);
   cleanSource = name: type: let
       baseName = baseNameOf (toString name);
