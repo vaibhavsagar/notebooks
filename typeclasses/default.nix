@@ -13,7 +13,7 @@ let
       };
     };
   };
-  nixpkgs = (import pkgs.nixpkgs { inherit system; overlays = [ overlay ]; config.allowBroken = true; });
+  nixpkgs = (import pkgs.nixpkgs { inherit system; overlays = [ overlay ];});
   jupyterlab = nixpkgs.python3.withPackages (ps: [ ps.jupyterlab ps.notebook ]);
 in nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc948"; }{
   extraEnvironmentBinaries = [ jupyterlab ];
