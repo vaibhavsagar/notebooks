@@ -21,7 +21,7 @@ let
     echo "root:x::" > $out/etc/gshadow
     echo "jovyan:!::" >> $out/etc/gshadow
   '';
-  ihaskell = nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc96"; }{
+  ihaskell = nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc98"; }{
     packages = self: with self; [];
     extraEnvironmentBinaries = [jupyterlab];
     staticExecutable = true;

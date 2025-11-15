@@ -1,10 +1,12 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/release-24.11";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.nix-filter.url = "github:numtide/nix-filter";
   inputs.ihaskell.url = "github:IHaskell/IHaskell";
   inputs.ihaskell.flake = false;
   inputs.flake-compat.url = "github:edolstra/flake-compat";
+  inputs.all-cabal-hashes.url = "github:commercialhaskell/all-cabal-hashes/hackage";
+  inputs.all-cabal-hashes.flake = false;
 
   nixConfig = {
     extra-substituters = [
@@ -17,7 +19,7 @@
     ];
   };
 
-  outputs = {self, nixpkgs, flake-utils, ...}:
+  outputs = {self, nixpkgs, flake-utils, all-cabal-hashes, ...}:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       notebook = folder: {

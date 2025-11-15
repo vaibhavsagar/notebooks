@@ -11,7 +11,7 @@ let
     sha256 = "sha256:1zaqvc0id5xagfzvlzxr8xaa7k4n4xbmvi68p7xz91rr960chi1c";
   };
   ihaskell-hvega = nixpkgs.haskellPackages.callCabal2nix "ihaskell-hvega" "${hvega-src}/ihaskell-hvega" {};
-in nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc96"; }{
+in nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc98"; }{
   extraEnvironmentBinaries = [ jupyterlab ];
   packages = self: with self; [ here ihaskell-hvega ];
 }
