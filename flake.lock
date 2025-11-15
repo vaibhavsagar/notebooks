@@ -53,11 +53,11 @@
     "ihaskell": {
       "flake": false,
       "locked": {
-        "lastModified": 1763215105,
-        "narHash": "sha256-XIe5hR3K0ByJSyAtezcB20tSqtEFIFg4lLhkFRd0wys=",
+        "lastModified": 1763215566,
+        "narHash": "sha256-bUez/OXgHaDyyeoaiGGx0vnchWauuV+rfj987a+gl7k=",
         "owner": "IHaskell",
         "repo": "IHaskell",
-        "rev": "b9c0ab3862b03abb6ae118da437fe8acef6e6113",
+        "rev": "ae23493342f9413a7ca3390d35b8411076fb35f9",
         "type": "github"
       },
       "original": {
