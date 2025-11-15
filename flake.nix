@@ -19,7 +19,7 @@
     ];
   };
 
-  outputs = {self, nixpkgs, flake-utils, all-cabal-hashes, ...}:
+  outputs = {self, nixpkgs, flake-utils, ...}:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
       notebook = folder: {
