@@ -3,11 +3,11 @@
     "all-cabal-hashes": {
       "flake": false,
       "locked": {
-        "lastModified": 1783354046,
-        "narHash": "sha256-7PMOiuhyQBquqCgjZ7RIlPY49Q0r0CnIizUSWJ0TgHI=",
+        "lastModified": 1783354682,
+        "narHash": "sha256-/Qsj64MV8SplEsol4D/0J+8PP8h2uw67eHTLzBEoVC8=",
         "owner": "commercialhaskell",
         "repo": "all-cabal-hashes",
-        "rev": "6f6469378180b68722ff347b8195ce4db91c25d4",
+        "rev": "200195d7e756e913582e52585f04c27692b83e7c",
         "type": "github"
       },
       "original": {
@@ -83,16 +83,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1783350928,
-        "narHash": "sha256-m7BEp4ZehuwdQ7P7ZYkPHKnG+bpeswmtU8s9e8R1C+8=",
+        "lastModified": 1783148766,
+        "narHash": "sha256-uslt2pqShTIXDdAHRHv2QkYLsVdY8Oqwz0EA48/RSM8=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "0f40be3ba0dd53c0eadf3c9237636d04d09c8f5b",
+        "rev": "a50de1b7d8a586adc18d2395c19de7d6058e6030",
         "type": "github"
       },
       "original": {
         "owner": "NixOS",
-        "ref": "release-26.05",
+        "ref": "nixos-26.05",
         "repo": "nixpkgs",
         "type": "github"
       }
