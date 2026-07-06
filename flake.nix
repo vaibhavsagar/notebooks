@@ -1,5 +1,5 @@
 {
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/release-26.05";
   inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.nix-filter.url = "github:numtide/nix-filter";
   inputs.ihaskell.url = "github:IHaskell/IHaskell";

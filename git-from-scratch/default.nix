@@ -4,7 +4,9 @@ let
   overlay = sel: sup: {
     nix-filter = import pkgs.nix-filter;
   };
-  nixpkgs = (import pkgs.nixpkgs { inherit system; overlays = [ overlay ]; });
+  # ghc-lib-parser-9.12 is incompatible with GHC 9.10: github.com/digital-asset/ghc-lib/issues/620
+  ghc910-overlay = import "${pkgs.ihaskell}/nix/overlay-9.10.nix";
+  nixpkgs = (import pkgs.nixpkgs { inherit system; overlays = [ overlay ghc910-overlay ]; });
   jupyterlab = nixpkgs.python3.withPackages (ps: [ ps.jupyterlab ps.notebook ]);
   cleanSource = name: type: let
       baseName = baseNameOf (toString name);
@@ -22,7 +24,7 @@ let
     );
   git-from-scratch =
     nixpkgs.haskellPackages.callCabal2nix "git-from-scratch" (builtins.filterSource cleanSource ./.) {};
-in nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc98"; }{
+in nixpkgs.callPackage "${pkgs.ihaskell}/nix/release.nix" { compiler = "ghc910"; enableHlint = false; }{
   packages = self: with self; [
     SHA
     attoparsec
