@@ -5,12 +5,12 @@ let
     nix-filter = import pkgs.nix-filter;
     haskell = sup.haskell // {
       packages = sup.haskell.packages // {
-        ghc910 = sup.haskell.packages.ghc910.override {
+        ghc910 = sup.haskell.packages.ghc910.override (old: {
           all-cabal-hashes = pkgs.all-cabal-hashes;
-          overrides = self: super: {
+          overrides = sel.lib.composeExtensions (old.overrides or (_: _: {})) (self: super: {
             sbv = sup.haskell.lib.dontCheck (self.callHackage "sbv" "14.4" {});
-          };
-        };
+          });
+        });
       };
     };
   };
