@@ -5,12 +5,12 @@ let
     nix-filter = import pkgs.nix-filter;
     haskell = sup.haskell // {
       packages = sup.haskell.packages // {
-        ghc910 = sup.haskell.packages.ghc910.override {
-          overrides = self: super: {
+        ghc910 = sup.haskell.packages.ghc910.override (old: {
+          overrides = sel.lib.composeExtensions (old.overrides or (_: _: {})) (self: super: {
             # overly restrictive upper bound on `containers`
             mono-traversable-keys = sup.haskell.lib.doJailbreak super.mono-traversable-keys;
-          };
-        };
+          });
+        });
       };
     };
   };
